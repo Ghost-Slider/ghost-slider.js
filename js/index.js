@@ -14,11 +14,11 @@ function normalize(evt) {
 
 $(function() {
 
-	$('.slideshow').bind('touchstart touchmove touchend', function(evt) {
+	$('.slideshow')
+	.bind('touchstart touchmove touchend', function(evt) {
 		evt.preventDefault();
 		return false;
-	})//;
-	//$('.slideshow > div')
+	})
 	.children()
 		.each(function(i) {
 			var all = $(this).siblings().andSelf().length;
@@ -48,24 +48,26 @@ $(function() {
 						$(this).data('slider.left', $(this).position().left);
 					});
 		})
-		/*.bind('dragleave mouseleave', function(evt) {
-			if ($(this).data('slider.isanimating'))
-				return;
-			$(this).trigger('touchend');
-		})*/
 		.bind('touchmove', function(evt, dx) {
 			if ($(this).data('slider.isanimating'))
 				return;
 			evt = normalize(evt);
 			evt.preventDefault();
 			// TODO Move from event to relative motion
-			if (dx == undefined) {
+			/*if (dx == undefined) {
 				var p0 = $(this).data('slider.p0');
 				var dx = evt.pageX - p0.left;
 				$(this).siblings().trigger('touchmove', dx);
 			}
 			var left = $(this).data('slider.left');
-			$(this).css({left: left + dx}).data('slider.dx', dx);
+			$(this).css({left: left + dx}).data('slider.dx', dx);*/
+			var p0 = $(this).data('slider.p0');
+			var dx = evt.pageX - p0.left;
+			$(this).data('slider.dx', dx)
+				.siblings().andSelf().each(function() {
+					var left = $(this).data('slider.left');
+					$(this).css({left: left + dx});
+				});
 		})
 		.bind('click', function(evt) {
 			if ($(this).data('slider.isanimating'))
@@ -94,15 +96,25 @@ $(function() {
 			
 	
 			var way = 0;
+			var stay = false;
 			if(Math.abs(dx) > $(this).width() * factor) {
 				way = Math.sign(dx) * $(this).outerWidth();
 			} else {
 				way = oldLeft;
+				stay = true;
 			}
 			way = way - $(this).position().left;
 			
-			if (!way)
+			if (!way) {
+				/*console.log(evt.pageX);
+				if (evt.pageX < $(this).outerWidth() * 0.25)
+					way = 1;
+				else if (evt.pageX > $(this).outerWidth() * 0.75)
+					way = -1;
+				else return;
+				way *= ($(this).outerWidth() - $(this).position().left);*/
 				return;
+			}
 			
 			$(this)
 				.siblings().andSelf()
@@ -113,6 +125,8 @@ $(function() {
 					}, {
 					complete : function() {
 						$(this).data('slider.isanimating', false);
+						if (stay)
+							return;
 						var i = parseInt($(this).attr('data-ui-index')) + Math.sign(dx);
 						var all = $(this).siblings().andSelf().length;
 						var max = all / 2;
