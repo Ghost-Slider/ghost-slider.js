@@ -7,8 +7,9 @@
 	width: 100%;
 	height: 200px;
 	border: 1px solid black;
-	overflow: hidden;
+	overflow: visible;
 	-webkit-user-select: none;
+	-moz-user-select: none;
 }
 .slideshow > * {
 	overflow: hidden;
@@ -18,6 +19,7 @@
 	height: 100%;
 	width: 100%;
 	position: absolute;
+	display: inline-block;
 }
 div#log {
 	width: 100%;
