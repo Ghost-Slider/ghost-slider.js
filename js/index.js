@@ -12,13 +12,6 @@ function normalize(evt) {
 	return evt;
 }
 
-function log() {
-	for(var i in arguments) {
-		console.log(arguments[i]);
-		$('#log').append($('<div/>').text(arguments[i]));
-	}
-}
-
 $(function() {
 
 	$('.slideshow').bind('touchstart touchmove touchend', function(evt) {
@@ -38,7 +31,6 @@ $(function() {
 				.css({
 					left: (i) * $(this).outerWidth()
 				});
-			log(all + ', ' + min + ', ' + max);
 		})
 		.bind('touchstart', function(evt) {
 			if ($(this).data('slider.isanimating'))
@@ -86,22 +78,31 @@ $(function() {
 			evt = normalize(evt);
 			evt.preventDefault();
 			
-			//var p0 = $(this).data('slider.p0');
 			var dx = $(this).data('slider.dx');
+			var time = $(this).data('slider.time');
+			var oldLeft = $(this).data('slider.left');
+			$(this).siblings().andSelf().each(function() {
+				$(this).removeData('slider.left').removeData('slider.time').removeData('slider.dx');
+			});
 			var factor = false;
-			if ($(this).data('slider.time'))
-				factor = (evt.timeStamp -  $(this).data('slider.time')) / 150 * 0.1;
-			if(factor && factor > 0.5)
+			if (time)
+				factor = (evt.timeStamp -  time) / 300 * 0.1;
+			if(factor > 0.5)
 				factor = 0.5;
+			if (factor < 0.1)
+				factor = 0.1;
 			
 	
 			var way = 0;
 			if(Math.abs(dx) > $(this).width() * factor) {
 				way = Math.sign(dx) * $(this).outerWidth();
 			} else {
-				way = $(this).data('slider.left');
+				way = oldLeft;
 			}
 			way = way - $(this).position().left;
+			
+			if (!way)
+				return;
 			
 			$(this)
 				.siblings().andSelf()
@@ -111,7 +112,6 @@ $(function() {
 						left : '+=' + way
 					}, {
 					complete : function() {
-						
 						$(this).data('slider.isanimating', false);
 						var i = parseInt($(this).attr('data-ui-index')) + Math.sign(dx);
 						var all = $(this).siblings().andSelf().length;
