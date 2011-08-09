@@ -4,10 +4,10 @@
 	font-weight: bold;
 	font-size: x-large;
 	border: 1px solid red;
-	width: 100%;
+	width: 940px;
 	height: 200px;
 	border: 1px solid black;
-	overflow: visible;
+	overflow: hidden;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 }
