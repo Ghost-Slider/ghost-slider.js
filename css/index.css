@@ -1,0 +1,28 @@
+.slideshow {
+	position: relative;
+	color: red;
+	font-weight: bold;
+	font-size: x-large;
+	border: 1px solid red;
+	width: 100%;
+	height: 200px;
+	border: 1px solid black;
+	overflow: hidden;
+	-webkit-user-select: none;
+}
+.slideshow > * {
+	overflow: hidden;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	cursor: pointer;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+}
+div#log {
+	width: 100%;
+	min-height: 100px;
+	background-color: black;
+	color: white;
+	position: relative;
+}
