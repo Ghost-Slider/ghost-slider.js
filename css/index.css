@@ -21,10 +21,7 @@
 	position: absolute;
 	display: inline-block;
 }
-div#log {
+.slideshow > * img {
+	height 100%;
 	width: 100%;
-	min-height: 100px;
-	background-color: black;
-	color: white;
-	position: relative;
 }

@@ -18,10 +18,9 @@ function normalize(evt) {
 }
 
 function MeAndMyNeighbors(elem) {
-	var index = parseInt(elem.data('slider.index'));
+	var index = elem.data('slider.index');
 	var m = elem.siblings().andSelf().filter(function() {
-		i = parseInt($(this).data('slider.index'));
-		//console.log($(this).data('slider.index') + ', ' + index + ', ' + i + ', ' + ((i == index - 1) || (i == index + 1) || (i == index)));
+		i = $(this).data('slider.index');
 		return (i == index - 1) || (i == index + 1) || (i == index);
 	});
 	return m;
@@ -31,15 +30,20 @@ $(function() {
 
 	$('.slideshow')
 	.bind('touchstart touchmove touchend', function(evt) {
+		evt = normalize(evt);
+		if (evt.touchCount > 1)
+			return;
 		evt.preventDefault();
+		evt.stopPropagation();
 		return false;
 	})
 	.children()
 		.each(function(i) {
 			var all = $(this).siblings().andSelf().length;
-			var max = all / 2;
+			var bounce = (all < 3) || ($(this).parent().attr('data-slider-carousel') == 'false');
+			var max = Math.floor(all / 2);
 			var min = max - all;
-			if (i > max)
+			if (!bounce && (i > max))
 				i = (i - max) + min;
 			$(this)
 				.data('slider.index', i)
@@ -47,11 +51,19 @@ $(function() {
 					left: (i) * $(this).parent().innerWidth()
 				});
 		})
-		.bind('touchstart', function(evt) {
-			evt.preventDefault();
+		.bind('click', function(evt) {
+			evt.stopPropagation();
 			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
+			$(this).data('slider.dx', (evt.which == 2 ? -1 : 1) * $(this).width()).trigger('touchend');
+		})
+		.bind('touchstart', function(evt) {
 			evt = normalize(evt);
+			if (evt.touchCount == 2)
+				return;
+				
+			if ($(this).siblings().andSelf().filter(':animated').length)
+				return;
 			
 			$(this)
 				.stop(true, true)
@@ -63,72 +75,86 @@ $(function() {
 						$(this).data('slider.left', $(this).position().left);
 					});
 		})
-		.bind('touchmove', function(evt, dx) {
-			evt.preventDefault();
+		.bind('touchmove', function(evt) {
+			evt = normalize(evt);
+			if (evt.touchCount == 2)
+				return;
+				
 			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
-			evt = normalize(evt);
 			var p0 = $(this).data('slider.p0');
 			if (!p0)
 				p0 = $(this).position();
 			var dx = evt.pageX - p0.left;
-			$(this).data('slider.dx', dx)
-				.siblings().andSelf().each(function() {
+			MeAndMyNeighbors($(this).data('slider.dx', dx))
+				.each(function() {
 					var left = $(this).data('slider.left');
 					$(this).css({left: left + dx});
 				});
 		})
-		.bind('click', function(evt) {
-			evt.preventDefault();
-			if ($(this).siblings().andSelf().filter(':animated').length)
-				return;
-			$(this).data('slider.dx', (evt.which == 2 ? -1 : 1) * $(this).width()).trigger('touchend');
-		})
 		.bind('touchend', function(evt) {
-			evt.preventDefault();
+			evt = normalize(evt);
+			if (evt.touchCount == 2)
+				return;
+
 			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
-			evt = normalize(evt);
 			
 			var dx = $(this).data('slider.dx');
 			var time = $(this).data('slider.time');
 			var oldLeft = $(this).data('slider.left');
 			$(this).siblings().andSelf().each(function() {
-				$(this).removeData('slider.left').removeData('slider.time').removeData('slider.dx');
+				$(this)
+					.removeData('slider.left')
+					.removeData('slider.time')
+					.removeData('slider.dx');
 			});
+			
+			var activeSlides = MeAndMyNeighbors($(this));
 			var factor = false;
+			var way = 0;
+			var stay = false;
+			var tapping = false;
+			var bounce = (all < 3) || (
+				($(this).parent().attr('data-slider-carousel') == 'false') &&
+				(activeSlides.length == 2)
+			);
+			var all = $(this).siblings().andSelf().length;
+			var max = Math.floor(all / 2);
+			var min = -max + (all % 2 ? 0 : 1);
+			var dir = 0;
+			
+			if (bounce)
+				dir = -Math.sign(activeSlides.not(this).data('slider.index'));
+				
+			console.log(activeSlides.length + ' slides active');
+			
 			if (time)
-				factor = (evt.timeStamp -  time) / 300 * 0.1;
+				factor = (evt.timeStamp -  time) / 200 * 0.1;
 			if(factor > 0.5)
 				factor = 0.5;
 			if (factor < 0.1)
 				factor = 0.1;
 			
-	
-			var way = 0;
-			var stay = false;
 			if(Math.abs(dx) > $(this).width() * factor) {
-				way = Math.sign(dx) * $(this).outerWidth();
+				way = Math.sign(dx) * $(this).outerWidth()- $(this).position().left;
 			} else {
-				way = oldLeft;
+				way = oldLeft - $(this).position().left;
 				stay = true;
 			}
-			way = way - $(this).position().left;
-			
+// 			
 			if (!way) {
-				console.log(way);
-				if (evt.pageX < $(this).outerWidth() * 0.05)
+				if ((evt.pageX < $(this).outerWidth() * 0.5) && (dir > -1))
 					dx = 1;
-				else if (evt.pageX > $(this).outerWidth() * 0.95)
+				else if ((evt.pageX > $(this).outerWidth() * 0.5) && (dir < 1))
 					dx = -1;
 				else return;
 				way = dx * ($(this).outerWidth() - $(this).position().left);
-				stay = false;/**/
-				/*return;/**/
+				stay = false;
 			}
 			
 			var easing = $(this).parent().attr('data-slider-easing') || 'easeInOutCubic';
-			MeAndMyNeighbors($(this))
+			activeSlides
 					.each(function() {
 					}).animate({
 						left : '+=' + way
@@ -138,51 +164,28 @@ $(function() {
 						if (stay)
 							return;
 						
-						if (!$(this).siblings(':animated').length) {
-							txt = '';
+						var txt = '';
+						if (
+							(!$(this).siblings(':animated').length)
+						) {
+							txt += all + '/' + max + '/' + min + ' ';
 							$(this).siblings().andSelf().each(function() {
-								var i = parseInt($(this).data('slider.index'));
-								
-								i += Math.sign(dx)
-								var all = $(this).siblings().andSelf().length;
-								var max = all / 2;
-								var min = max - all;
-								if (i <= min)
-									i = max;
-								else if (i > max)
-									i = min + 1;
+								var i = $(this).data('slider.index');
+								txt += i + ' => ';
+								i += Math.sign(way);
+								if ($(this).parent().attr('data-slider-carousel') != 'false') {
+									if (i < min)
+										i = max;
+									else if (i > max)
+										i = min;
+								}
+								txt += i + ' (';
 								$(this).data('slider.index', i).css({left: i * $(this).parent().innerWidth()});
-								/*if (i <= min) {
-									var l = max * $(this).parent().innerWidth();
-									$(this).attr('data-ui-index', max).css({left: l});
-								} else if (i > max) {
-									var l = (min + 1) * $(this).parent().innerWidth();
-									$(this).attr('data-ui-index', (min + 1)).css({left: l});
-								} else
-									$(this).attr('data-ui-index', i);
-								*/
+								txt += $(this).data('slider.index') + ') | ';
 							});
+							console.log(txt);
 						}
 					}
 				});
 			});
 });
-// ----
-
-/*( function(scriptSrc, config) {
-	var script = document.createElement('script');
-	script.src = scriptSrc;
-	script.type = 'text/javascript';
-	script.addEventListener('load', function() {
-		if('phantomLimb' in window) {
-			phantomLimb.init(config)
-		} else {
-			console.error('Phantom Limb could not be loaded')
-		}
-	}, false);
-	document.head.appendChild(script)
-}('js/phantomLimb.js', {
-	src : '',
-	lefty : false
-}));
-*/
