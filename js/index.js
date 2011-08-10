@@ -1,15 +1,30 @@
-if(!Math.sign) {
+if (!Math.sign) {
 	Math.sign = function(_in) {
 		return _in < 0 ? -1 : 1;
 	};
 }
 
 function normalize(evt) {
-	if(evt && evt.originalEvent && evt.originalEvent.touches && evt.originalEvent.touches.length) {
+	if (evt && evt.originalEvent && evt.originalEvent.touches && evt.originalEvent.touches.length) {
 		evt.pageX = evt.originalEvent.touches[0].pageX;
 		evt.pageY = evt.originalEvent.touches[0].pageY;
+		evt.touchCount = evt.originalEvent.touches.length;
+	} else if (evt && evt.originalEvent && evt.originalEvent.changedTouches && evt.originalEvent.changedTouches.length) {
+		evt.pageX = evt.originalEvent.changedTouches[0].pageX;
+		evt.pageY = evt.originalEvent.changedTouches[0].pageY;
+		evt.touchCount = evt.originalEvent.changedTouches.length;
 	}
 	return evt;
+}
+
+function MeAndMyNeighbors(elem) {
+	var index = parseInt(elem.data('slider.index'));
+	var m = elem.siblings().andSelf().filter(function() {
+		i = parseInt($(this).data('slider.index'));
+		//console.log($(this).data('slider.index') + ', ' + index + ', ' + i + ', ' + ((i == index - 1) || (i == index + 1) || (i == index)));
+		return (i == index - 1) || (i == index + 1) || (i == index);
+	});
+	return m;
 }
 
 $(function() {
@@ -27,16 +42,16 @@ $(function() {
 			if (i > max)
 				i = (i - max) + min;
 			$(this)
-				.attr('data-ui-index', i)
+				.data('slider.index', i)
 				.css({
-					left: (i) * $(this).outerWidth()
+					left: (i) * $(this).parent().innerWidth()
 				});
 		})
 		.bind('touchstart', function(evt) {
-			if ($(this).data('slider.isanimating'))
+			evt.preventDefault();
+			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
 			evt = normalize(evt);
-			evt.preventDefault();
 			
 			$(this)
 				.stop(true, true)
@@ -49,19 +64,13 @@ $(function() {
 					});
 		})
 		.bind('touchmove', function(evt, dx) {
-			if ($(this).data('slider.isanimating'))
+			evt.preventDefault();
+			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
 			evt = normalize(evt);
-			evt.preventDefault();
-			// TODO Move from event to relative motion
-			/*if (dx == undefined) {
-				var p0 = $(this).data('slider.p0');
-				var dx = evt.pageX - p0.left;
-				$(this).siblings().trigger('touchmove', dx);
-			}
-			var left = $(this).data('slider.left');
-			$(this).css({left: left + dx}).data('slider.dx', dx);*/
 			var p0 = $(this).data('slider.p0');
+			if (!p0)
+				p0 = $(this).position();
 			var dx = evt.pageX - p0.left;
 			$(this).data('slider.dx', dx)
 				.siblings().andSelf().each(function() {
@@ -70,15 +79,16 @@ $(function() {
 				});
 		})
 		.bind('click', function(evt) {
-			if ($(this).data('slider.isanimating'))
+			evt.preventDefault();
+			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
-			$(this).data('slider.dx', 1 * $(this).width()).trigger('touchend');
+			$(this).data('slider.dx', (evt.which == 2 ? -1 : 1) * $(this).width()).trigger('touchend');
 		})
 		.bind('touchend', function(evt) {
-			if ($(this).data('slider.isanimating'))
+			evt.preventDefault();
+			if ($(this).siblings().andSelf().filter(':animated').length)
 				return;
 			evt = normalize(evt);
-			evt.preventDefault();
 			
 			var dx = $(this).data('slider.dx');
 			var time = $(this).data('slider.time');
@@ -106,39 +116,53 @@ $(function() {
 			way = way - $(this).position().left;
 			
 			if (!way) {
-				/*console.log(evt.pageX);
-				if (evt.pageX < $(this).outerWidth() * 0.25)
-					way = 1;
-				else if (evt.pageX > $(this).outerWidth() * 0.75)
-					way = -1;
+				console.log(way);
+				if (evt.pageX < $(this).outerWidth() * 0.05)
+					dx = 1;
+				else if (evt.pageX > $(this).outerWidth() * 0.95)
+					dx = -1;
 				else return;
-				way *= ($(this).outerWidth() - $(this).position().left);*/
-				return;
+				way = dx * ($(this).outerWidth() - $(this).position().left);
+				stay = false;/**/
+				/*return;/**/
 			}
 			
-			$(this)
-				.siblings().andSelf()
+			var easing = $(this).parent().attr('data-slider-easing') || 'easeInOutCubic';
+			MeAndMyNeighbors($(this))
 					.each(function() {
-						$(this).data('slider.isanimating', true);
 					}).animate({
 						left : '+=' + way
 					}, {
+					easing : easing,
 					complete : function() {
-						$(this).data('slider.isanimating', false);
 						if (stay)
 							return;
-						var i = parseInt($(this).attr('data-ui-index')) + Math.sign(dx);
-						var all = $(this).siblings().andSelf().length;
-						var max = all / 2;
-						var min = max - all;
-						if (i <= min) {
-							var l = max * $(this).parent().innerWidth();
-							$(this).attr('data-ui-index', max).css({left: l});
-						} else if (i > max) {
-							var l = (min + 1) * $(this).parent().innerWidth();
-							$(this).attr('data-ui-index', (min + 1)).css({left: l});
-						} else
-							$(this).attr('data-ui-index', i);
+						
+						if (!$(this).siblings(':animated').length) {
+							txt = '';
+							$(this).siblings().andSelf().each(function() {
+								var i = parseInt($(this).data('slider.index'));
+								
+								i += Math.sign(dx)
+								var all = $(this).siblings().andSelf().length;
+								var max = all / 2;
+								var min = max - all;
+								if (i <= min)
+									i = max;
+								else if (i > max)
+									i = min + 1;
+								$(this).data('slider.index', i).css({left: i * $(this).parent().innerWidth()});
+								/*if (i <= min) {
+									var l = max * $(this).parent().innerWidth();
+									$(this).attr('data-ui-index', max).css({left: l});
+								} else if (i > max) {
+									var l = (min + 1) * $(this).parent().innerWidth();
+									$(this).attr('data-ui-index', (min + 1)).css({left: l});
+								} else
+									$(this).attr('data-ui-index', i);
+								*/
+							});
+						}
 					}
 				});
 			});
