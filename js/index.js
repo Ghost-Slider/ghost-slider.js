@@ -26,6 +26,8 @@ function MeAndMyNeighbors(elem) {
 	return m;
 }
 
+
+
 $(function() {
 
 	$('.slideshow')
@@ -101,8 +103,40 @@ $(function() {
 				return;
 			
 			var dx = $(this).data('slider.dx');
+			var curX = evt.pageX;
 			var time = $(this).data('slider.time');
 			var oldLeft = $(this).data('slider.left');
+			
+			var activeSlides = MeAndMyNeighbors($(this));
+			var factor = false;
+			var way = 0;
+			var stay = false;
+			var tapping = false;
+			var all = $(this).siblings().andSelf().length;
+			var max = Math.floor(all / 2);
+			var min = -max + (all % 2 ? 0 : 1);
+			var dir = 0;
+			var bounce = (all < 3) || (
+				($(this).parent().attr('data-slider-carousel') == 'false') &&
+				(activeSlides.length == 2)
+			);
+			var easing = $(this).parent().attr('data-slider-easing') || 'easeInOutCubic';
+			var now = evt.timeStamp;
+			var slidingOffset = 0;
+			
+			if (bounce)
+				dir = -Math.sign(activeSlides.not(this).data('slider.index'));
+			if (all == 1)
+				dir = 2;
+				
+			
+			if (time)
+				factor = (now -  time) / 200 * 0.1;
+			if(factor > 0.5)
+				factor = 0.5;
+			if (factor < 0.1)
+				factor = 0.1;
+			
 			$(this).siblings().andSelf().each(function() {
 				$(this)
 					.removeData('slider.left')
@@ -110,31 +144,8 @@ $(function() {
 					.removeData('slider.dx');
 			});
 			
-			var activeSlides = MeAndMyNeighbors($(this));
-			var factor = false;
-			var way = 0;
-			var stay = false;
-			var tapping = false;
-			var bounce = (all < 3) || (
-				($(this).parent().attr('data-slider-carousel') == 'false') &&
-				(activeSlides.length == 2)
-			);
-			var all = $(this).siblings().andSelf().length;
-			var max = Math.floor(all / 2);
-			var min = -max + (all % 2 ? 0 : 1);
-			var dir = 0;
-			var easing = $(this).parent().attr('data-slider-easing') || 'easeInOutCubic';
 			
-			if (bounce)
-				dir = -Math.sign(activeSlides.not(this).data('slider.index'));
-				
-			
-			if (time)
-				factor = (evt.timeStamp -  time) / 200 * 0.1;
-			if(factor > 0.5)
-				factor = 0.5;
-			if (factor < 0.1)
-				factor = 0.1;
+			// <---------------------------------------------------------------------------------->
 			
 			if(
 				(Math.abs(dx) > $(this).width() * factor) &&
@@ -147,9 +158,9 @@ $(function() {
 			}
 // 			
 			if (!way) {
-				if ((evt.pageX < $(this).outerWidth() * 0.5) && (dir > -1))
+				if ((curX < $(this).outerWidth() * 0.5) && (dir > -1))
 					dx = 1;
-				else if ((evt.pageX > $(this).outerWidth() * 0.5) && (dir < 1))
+				else if ((curX > $(this).outerWidth() * 0.5) && (dir < 1))
 					dx = -1;
 				else return;
 				way = dx * ($(this).outerWidth() - $(this).position().left);
