@@ -123,11 +123,11 @@ $(function() {
 			var max = Math.floor(all / 2);
 			var min = -max + (all % 2 ? 0 : 1);
 			var dir = 0;
+			var easing = $(this).parent().attr('data-slider-easing') || 'easeInOutCubic';
 			
 			if (bounce)
 				dir = -Math.sign(activeSlides.not(this).data('slider.index'));
 				
-			console.log(activeSlides.length + ' slides active');
 			
 			if (time)
 				factor = (evt.timeStamp -  time) / 200 * 0.1;
@@ -136,7 +136,10 @@ $(function() {
 			if (factor < 0.1)
 				factor = 0.1;
 			
-			if(Math.abs(dx) > $(this).width() * factor) {
+			if(
+				(Math.abs(dx) > $(this).width() * factor) &&
+				(dir ? (Math.sign(dx) == dir) : true)
+			) {
 				way = Math.sign(dx) * $(this).outerWidth()- $(this).position().left;
 			} else {
 				way = oldLeft - $(this).position().left;
@@ -153,7 +156,8 @@ $(function() {
 				stay = false;
 			}
 			
-			var easing = $(this).parent().attr('data-slider-easing') || 'easeInOutCubic';
+			slidingOffset = Math.sign(way);
+			
 			activeSlides
 					.each(function() {
 					}).animate({
@@ -172,7 +176,7 @@ $(function() {
 							$(this).siblings().andSelf().each(function() {
 								var i = $(this).data('slider.index');
 								txt += i + ' => ';
-								i += Math.sign(way);
+								i += slidingOffset;
 								if ($(this).parent().attr('data-slider-carousel') != 'false') {
 									if (i < min)
 										i = max;
@@ -180,8 +184,9 @@ $(function() {
 										i = min;
 								}
 								txt += i + ' (';
-								$(this).data('slider.index', i).css({left: i * $(this).parent().innerWidth()});
-								txt += $(this).data('slider.index') + ') | ';
+								var f = Math.abs(i) > 1 ? Math.sign(i) : i;
+								$(this).data('slider.index', i).css({left: f * $(this).parent().innerWidth()});
+								txt += $(this).position().left + ') | ';
 							});
 							console.log(txt);
 						}
