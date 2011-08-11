@@ -67,11 +67,10 @@
 						if (!bounce && (i > max))
 							i = (i - max) + min;
 						var f = Math.abs(i) > 1 ? Math.sign(i) : i;
-						//console.log(f + ' ' + i);
 						$(this)
 							.data('slider.position', i)
 							.attr(Slider.indexAttr, n)
-							.css({left: f * $(this).outerWidth()});
+							.css({left: f * $(this).parent().width()});
 					})
 					.bind('touchstart touchend touchmove', $.proxy(this, 'touchHandler'));
 					
@@ -197,7 +196,7 @@
 					$(this).data('slider.position', i).css({left: f * $(this).parent().innerWidth()});
 					txt += $(this).attr(Slider.indexAttr) + ') | ';
 				});
-				console.log(txt);
+				//console.log(txt);
 			}
 		},
 		
@@ -206,9 +205,9 @@
 			if (this.slider.children(':animated').length)
 				return;
 			if (evt.pageX > 0.5 * this.slider.outerWidth())
-				this.next();
+				this.left();
 			else
-				this.previous();
+				this.right();
 		},
 		
 		left: function() {
