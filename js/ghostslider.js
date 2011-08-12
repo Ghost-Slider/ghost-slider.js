@@ -44,12 +44,11 @@
 	
 	
 	
-	
-	
 	function Slider() { this._init.apply(this, arguments); };
 	Slider.indexAttr = 'data-ui-index';
 	Slider.prototype = {
 		timer: undefined,
+		reverse: [],
 		
 		_init: function(elem) {
 			this.slider = elem;
@@ -59,8 +58,17 @@
 			var min = max - all;
 			elem
 				.data('slider', this)
-				.click($.proxy(this, 'click'))
-				.bind('touchstart touchend touchmove', this.touchBreak)
+				.bind('touchstart touchmove', this.touchBreak)
+				.resize(function(evt) {
+					$(this).children().each(function() {
+						var i = $(this).data('slider.index');
+						if (i == undefined)
+							return;
+						i = Math.abs(i) > 1 ? Math.sign(i) : i;
+						$(this).css({left: i * $(this).parent().width()});
+					});
+				})
+				.find('a').bind('touchstart touchend', $.proxy(this, 'clickHandler')).end()
 				.children()
 					.each(function(n) {
 						var i = n;
@@ -82,6 +90,12 @@
 					dir = 'right';
 				this.timer = window.setInterval(function() { self[dir](); }, parseInt(intervall));
 			}
+		},
+		
+		clickHandler: function(evt) {
+			if (this.dx)
+				return;
+			evt.stopPropagation();
 		},
 		
 		touchBreak: function(evt) {
@@ -111,7 +125,10 @@
 		touchmove: function (evt) {
 			if (!this.p0)
 				this.p0 = $(evt.currentTarget).position();
-			this.dx = dx = evt.pageX - this.p0.left;
+			dx = evt.pageX - this.p0.left;
+			if (this.reverse.length || (this.dx > dx))
+				this.reverse.push(this.dx);
+			this.dx = dx;
 			MeAndMyNeighbors($(evt.currentTarget))
 				.each(function() {
 					var left = $(this).data('slider.left');
@@ -126,6 +143,7 @@
 			data.currentSlide = $(evt.currentTarget);
 			data.activeSlides = MeAndMyNeighbors(data.currentSlide);
 			
+			
 			data.dx = this.dx;
 			data.curX = evt.pageX;
 			data.time = this.time;
@@ -133,7 +151,6 @@
 			data.factor = false;
 			data.way = 0;
 			data.stay = false;
-			data.tapping = false;
 			
 			data.all = this.slider.children().length;
 			data.max = Math.floor(data.all / 2);
@@ -145,7 +162,7 @@
 				(this.slider.attr('data-slider-carousel') == 'false') &&
 				(data.activeSlides.length == 2)
 			);
-			data.easing = this.slider.attr('data-slider-easing') || 'easeInOutCubic';
+			data.easing = this.slider.attr('data-slider-easing') || 'easeOutExpo';
 			data.now = evt.timeStamp;
 			
 			if (data.bounce)
@@ -155,18 +172,21 @@
 				
 			
 			if (data.time)
-				data.factor = (data.now - data.time) / 200 * 0.1;
+				data.factor = (data.now - data.time) / 2000 * 0.1;
 			if(data.factor > 0.5)
 				data.factor = 0.5;
-			if (data.factor < 0.1)
-				data.factor = 0.1;
-			
+				
+			this.cleanUp();
+			$.fn.ghostslider.animations.slide.finish.call(this, data);
+		},
+		
+		cleanUp: function() {
 			this.slider.children().each(function() {
 				$(this)
 					.removeData('slider.left');
 			});
-			
-			$.fn.ghostslider.animations.slide.finish.call(this, data);
+			this.dx = false;
+			this.dy = false;
 		},
 		
 		completion: function(slide, data) {
@@ -177,7 +197,6 @@
 			
 			var txt = '';
 			if ( !slide.siblings(':animated').length ) {
-				txt += data.all + '/' + data.max + '/' + data.min + ' ';
 				slide.siblings().andSelf().each(function() {
 					var i = $(this).data('slider.position');
 					txt += i + ' => ';
@@ -194,20 +213,8 @@
 					txt += i + ' (';
 					var f = Math.abs(i) > 1 ? Math.sign(i) : i;
 					$(this).data('slider.position', i).css({left: f * $(this).parent().innerWidth()});
-					txt += $(this).attr(Slider.indexAttr) + ') | ';
 				});
-				//console.log(txt);
 			}
-		},
-		
-		click: function(evt) {
-			evt.stopPropagation();
-			if (this.slider.children(':animated').length)
-				return;
-			if (evt.pageX > 0.5 * this.slider.outerWidth())
-				this.left();
-			else
-				this.right();
 		},
 		
 		left: function() {
@@ -245,7 +252,6 @@
 			data.factor = 0;
 			data.way = 0;
 			data.stay = false;
-			data.tapping = false;
 			
 			data.all = this.slider.children().length;
 			data.max = Math.floor(data.all / 2);
@@ -256,7 +262,7 @@
 				(this.slider.attr('data-slider-carousel') == 'false') &&
 				(data.activeSlides.length == 2)
 			);
-			data.easing = this.slider.attr('data-slider-easing') || 'easeInOutCubic';
+			data.easing = this.slider.attr('data-slider-easing') || 'easeOutExpo';
 			data.now = 0;
 			
 			if (data.bounce)
@@ -264,6 +270,7 @@
 			if (data.all == 1)
 				data.dir = 2;
 			
+			this.cleanUp();
 			$.fn.ghostslider.animations.slide.finish.call(this, data);
 		},
 	};
@@ -295,16 +302,8 @@
 				data.stay = true;
 			}
 // 			
-			if (!data.way) {
-				if ((data.curX < data.currentSlide.outerWidth() * 0.5) && (data.dir > -1))
-					data.dx = 1;
-				else if ((data.curX > data.currentSlide.outerWidth() * 0.5) && (data.dir < 1))
-					data.dx = -1;
-				else return;
-				data.way = data.dx * (data.currentSlide.outerWidth() - data.currentSlide.position().left);
-				data.stay = false;
-				// return;
-			}
+			if (!data.way)
+				return;
 			
 			if (!data.slidingOffset)
 				data.slidingOffset = Math.sign(data.way);
