@@ -2,7 +2,6 @@
 .slideshow {
 	position: relative;
 	overflow: hidden;
-	outline: 1px solid red;
 	margin: 0px;
 	padding: 0px;
 }
@@ -15,6 +14,11 @@
 	display: block;
 	margin: 0px;
 	padding: 0px;
+}
+
+.slideshow * {
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
 }
 
 img {
@@ -40,10 +44,21 @@ img {
 #orange-d {
 	width: 970px;
 	height: 330px;
-	border: 1px solid yellow;
+}
+
+.prev, .next {
+	height: 330px;
+	display: table-cell;
+	background-color: gray;
+	cursor: pointer;
+	vertical-align: middle;
+	-webkit-user-select: none;
+	-webkit-user-drag: none;
+	width: 25px;
+	text-align: center;
 }
 
 #wordpress {
 	width: 700px;
-	height: 200px;
+	height: 330px;
 }

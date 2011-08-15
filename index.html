@@ -1,128 +1,131 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="expires" content="0" />
-		<title>
-			Ghostslider
-		</title>
+		<title> Ghostslider </title>
 		<link rel="stylesheet" type="text/css" href="css/index.css" />
 		<script type="text/javascript" src="js/jquery-1.6.2.js"></script>
 		<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
 		<script type="text/javascript" src="js/ghostslider.js"></script>
 		<script type="text/javascript">
 			$(function() {
-				$('#hello').html(
-					$('#wordpress').width() + ' #wordpress<br/>' +
-					$('body').width() + ' body<br/>' +
-					$('#funny').width() + ' #funny<br/>'
-				);
+				$('#hello').html($('#wordpress').width() + ' #wordpress<br/>' + $('body').width() + ' body<br/>' + $('#funny').width() + ' #funny<br/>');
+
+				$('#orange-d > li').each(function(i) {
+					$('#orange-d-selector').append($('<a>').attr('data-slide', i).text(' Slide ' + ++i + ' ').click(function() {
+						$('#orange-d').ghostslider('moveTo', $(this).attr('data-slide'));
+					}))
+				});
+				$('#orange-d').bind('slidecomplete', function(evt, hasLeft, hasRight, slide) {
+					$('.prev[data-slider=#orange-d]').animate({
+						opacity : hasLeft ? 1 : 0
+					}, 'fast');
+					$('.next[data-slider=#orange-d]').animate({
+						opacity : hasRight ? 1 : 0
+					}, 'fast');
+					console.log('Slide ' + slide.attr('data-slider-index'));
+				});
+				$('.prev, .next').click(function(evt) {
+					var $this = $(this);
+					var slider = $($this.attr('data-slider'));
+					if($this.hasClass('prev') && slider.ghostslider('hasLeft'))
+						slider.ghostslider('left');
+					if($this.hasClass('next') && slider.ghostslider('hasRight'))
+						slider.ghostslider('right');
+				});
 			});
+
 		</script>
 	</head>
 	<body>
-		<div style="width:1024px; background-color: blue; height: 10px;">&nbsp;</div>
-		<h1>
-			HOY
-		</h1>
-		<ul class="slideshow" data-slider-easing="easeOutExpo" data-slider-carousel="true" id="wordpress">
-			<li style="background-color: hsl(255, 100%, 50%);">
- 				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/trolley.jpg" alt="trolley" />
- 			</li>
-			<li style="background-color: hsl(32, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/wheel.jpg" alt="wheel" />
-			</li>
-			<li style="background-color: hsl(64, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/shore.jpg" alt="shore" />
-			</li>
-			<li style="background-color: hsl(96, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/pine-cone.jpg" alt="pine-cone" />
-			</li>
-			<li style="background-color: hsl(128, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/chessboard.jpg" alt="chessboard" />
-			</li>
-			<li style="background-color: hsl(160, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/lanterns.jpg" alt="lanterns" />
-			</li>
-			<li style="background-color: hsl(192, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/hanoi.jpg" alt="hanoi" />
-			</li>
-			<li style="background-color: hsl(224, 100%, 50%);">
-				<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/willow.jpg" alt="willow" />
-			</li>
-		</ul>
- 		<ul class="slideshow" id="orange-d" data-slider-autoslide-direction="left">
-			<li>
-				<div class="folie-1">
-					<video src="http://freshly-ground.com/data/video/rubber-chicken-iPhone.m4v" />
-				</div>
-			</li>
-			<li>
-				<div class="folie-2">
-					<table>
-						<tr>
-							<td class="col1">
-								<a href="http://orange-d.net/kernkompetenzen/branding-coporate-design/"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-branding.png" width="99" height="99" alt="Branding und Corporate Design" /></a>
-							</td>
-							<td class="col2">
-								<h2>
-									Bran­ding und<br />
-									Cor­po­rate Design
-								</h2>
+		<div style="width:1024px; background-color: blue; height: 10px;">
+			&nbsp;
+		</div>
+		<h1> HOY </h1>
+		<div style="display: table">
+			<a class="prev" data-slider="#wordpress">&lt;</a>
+			<ul class="slideshow" data-slider-easing="easeOutExpo" data-slider-carousel="true" id="wordpress">
+				<li style="background-color: hsl(255, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/trolley.jpg" alt="trolley" />
+				</li>
+				<li style="background-color: hsl(32, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/wheel.jpg" alt="wheel" />
+				</li>
+				<li style="background-color: hsl(64, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/shore.jpg" alt="shore" />
+				</li>
+				<li style="background-color: hsl(96, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/pine-cone.jpg" alt="pine-cone" />
+				</li>
+				<li style="background-color: hsl(128, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/chessboard.jpg" alt="chessboard" />
+				</li>
+				<li style="background-color: hsl(160, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/lanterns.jpg" alt="lanterns" />
+				</li>
+				<li style="background-color: hsl(192, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/hanoi.jpg" alt="hanoi" />
+				</li>
+				<li style="background-color: hsl(224, 100%, 50%);">
+					<img src="http://www.example.com/wp-content/themes/twentyeleven/images/headers/willow.jpg" alt="willow" />
+				</li>
+			</ul>
+			<a class="next" data-slider="#wordpress">&gt;</a>
+		</div>
+		<br/>
+		<div style="display: table">
+			<a class="prev" data-slider="#orange-d">&lt;</a>
+			<ul class="slideshow" id="orange-d" data-slider-autoslide-direction="left" data-slider-carousel="false">
+				<li>
+					<div class="folie-1">
+						<img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-01.jpg" />
+					</div>
+				</li>
+				<li>
+					<div class="folie-2">
+						<table>
+							<tr>
+								<td class="col1"><a href="http://orange-d.net/kernkompetenzen/branding-coporate-design/"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-branding.png" width="99" height="99" alt="Branding und Corporate Design" /></a></td>
+								<td class="col2"><h2> Bran­ding und
+								<br />
+								Cor­po­rate Design </h2>
 								<p class="link">
 									<a href="http://orange-d.net/kernkompetenzen/branding-coporate-design/">zeig mal</a>
-								</p>
-							</td>
-							<td class="col3">
-								<h2>
-									Web- und Mediendesign
-								</h2>
+								</p></td>
+								<td class="col3"><h2> Web- und Mediendesign </h2>
 								<p class="link">
 									<a href="http://orange-d.net/kernkompetenzen/web-und-medien/">zeig mal</a>
-								</p>
-							</td>
-							<td class="col4">
-								<a href="http://orange-d.net/kernkompetenzen/web-und-medien/"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-web-media.png" width="99" height="99" alt="Web- und Mediendesign" /></a>
-							</td>
-						</tr>
-						<tr>
-							<td class="col1">
-								<a href="http://orange-d.net/kernkompetenzen/etiketten-verpackungen/"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-etiketten.png" width="99" height="99" alt="Etiketten- und Verpackungsdesign" /></a>
-							</td>
-							<td class="col2">
-								<h2>
-									Etiketten- und Verpackungsdesign
-								</h2>
+								</p></td>
+								<td class="col4"><a href="http://orange-d.net/kernkompetenzen/web-und-medien/"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-web-media.png" width="99" height="99" alt="Web- und Mediendesign" /></a></td>
+							</tr>
+							<tr>
+								<td class="col1"><a href="http://orange-d.net/kernkompetenzen/etiketten-verpackungen/"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-etiketten.png" width="99" height="99" alt="Etiketten- und Verpackungsdesign" /></a></td>
+								<td class="col2"><h2> Etiketten- und Verpackungsdesign </h2>
 								<p class="link">
 									<a href="http://orange-d.net/kernkompetenzen/etiketten-verpackungen/">zeig mal</a>
-								</p>
-							</td>
-							<td class="col3">
-								<h2>
-									clou-D: Managed-WordPress-Cloud-Hosting
-								</h2>
+								</p></td>
+								<td class="col3"><h2> clou-D: Managed-WordPress-Cloud-Hosting </h2>
 								<p class="link">
 									<a href="http://clou-d.net/" target="_blank">com­ing soon</a>
-								</p>
-							</td>
-							<td class="col4">
-								<img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-clou-d.png" width="99" height="99" alt="Cloud-Managed WordPress Hosting" />
-							</td>
-						</tr>
-					</table>
-				</div>
-			</li>
-			<li>
-				<div class="folie-3">
-					<img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-03.jpg" />
-				</div>
-			</li>
-		</ul>
+								</p></td>
+								<td class="col4"><img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-2/icon-clou-d.png" width="99" height="99" alt="Cloud-Managed WordPress Hosting" /></td>
+							</tr>
+						</table>
+					</div>
+				</li>
+				<li>
+					<div class="folie-3">
+						<img src="http://orange-d.net/wp-content/themes/thesis/custom/2/images/slider/slide-03.jpg" />
+					</div>
+				</li>
+			</ul>
+			<a class="next" data-slider="#orange-d">&gt;</a>
+		</div>
+		<div id="orange-d-selector"></div>
 		<hr />
-		<h1 id="hello">
-			Hello Headline
-		</h1>
+		<h1 id="hello"> Hello Headline </h1>
 		<hr />
 		<div id="funny">
 			Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
