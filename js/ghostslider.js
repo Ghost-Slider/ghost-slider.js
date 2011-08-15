@@ -166,6 +166,7 @@
 			this.dx = 0;
 			this.dy = 0;
 			this.breakSlide = false;
+			this.forceSlide = false;
 			this.slider.children().stop(true, true).each(function() {
 				$(this).data('slider.left', $(this).position().left);
 			});
@@ -184,9 +185,10 @@
 			if (this.reverse.length || (this.dx > dx))
 				this.reverse.push(this.dx);
 			this.dx = dx;
-			this.dy = dy;
+			this.dy = this.forceSlide ? 0 : dy;
 			if (Math.abs(this.dy) > Math.abs(this.dx))
 				return;
+			this.forceSlide = true;
 			MeAndMyNeighbors($(evt.currentTarget))
 				.each(function() {
 					var left = $(this).data('slider.left');
