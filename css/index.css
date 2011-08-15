@@ -1,46 +1,6 @@
-
-.slideshow {
-	position: relative;
-	overflow: hidden;
-	margin: 0px;
-	padding: 0px;
-}
-
-.slideshow > * {
-	overflow: hidden;
-	height: inherit;
-	width: inherit;
-	position: absolute;
-	display: block;
-	margin: 0px;
-	padding: 0px;
-}
-
-.slideshow * {
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-webkit-user-drag: none;
-}
-
 img {
 	width: 100% !important;
 }
-
-/** {
-	width: 100%;
-	outline: none;
-	border: none;
-	padding: 0px;
-	margin: 0px;
-}*/
-
-/*html {
-	background-color: fuchsia;
-	padding: 0px;
-	margin: 0px;
-	outline: none;
-	border: none;
-}*/
 
 #orange-d {
 	width: 970px;

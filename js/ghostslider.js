@@ -60,6 +60,7 @@
 	Slider.prototype = {
 		timer: undefined,
 		reverse: [],
+		animation: undefined,
 		
 		/**
 		 * Initialize the slider.
@@ -104,6 +105,8 @@
 					dir = 'right';
 				this.timer = window.setInterval(function() { self[dir](); }, parseInt(intervall));
 			}
+			
+			this.animation = $.fn.ghostslider.animations.slide;
 		},
 		
 		/**
@@ -189,11 +192,7 @@
 			if (Math.abs(this.dy) > Math.abs(this.dx))
 				return;
 			this.forceSlide = true;
-			MeAndMyNeighbors($(evt.currentTarget))
-				.each(function() {
-					var left = $(this).data('slider.left');
-					$(this).css({left: left + dx});
-				});
+			this.animation.slide.call(this, MeAndMyNeighbors($(evt.currentTarget)), this);
 			this.slider.trigger('sliding', this.dx);
 		},
 		
@@ -238,7 +237,7 @@
 				data.factor = 0.5;
 				
 			this._cleanUp();
-			$.fn.ghostslider.animations.slide.finish.call(this, data);
+			this.animation.finish.call(this, data);
 		},
 		
 		_cleanUp: function() {
@@ -361,7 +360,7 @@
 				data.dir = 2;
 			
 			this._cleanUp();
-			$.fn.ghostslider.animations.slide.finish.call(this, data);
+			this.animation.finish.call(this, data);
 		},
 	};
 	
@@ -381,6 +380,13 @@
 	
 	$.fn.ghostslider.animations = {};
 	$.fn.ghostslider.animations.slide = {
+		slide: function(slides, data) {
+			slides
+				.each(function() {
+					var left = $(this).data('slider.left');
+					$(this).css({left: left + data.dx});
+				});
+		},
 		finish: function(data) {
 			if(
 				(Math.abs(data.dx) > data.currentSlide.width() * data.factor) &&
@@ -410,6 +416,56 @@
 						complete : function() { self._complete(this, data); }
 						}
 					);
+		}
+	};
+	
+	$.fn.ghostslider.animations.fade = {
+		slide: function(slides, data) {
+			slides
+				.each(function() {
+					var left = $(this).data('slider.position') != Math.sign(data.dx) ? 0 : $(this).position().left;
+					var zIndex = $(this).data('slider.position') ? 0 : 100;
+					var opacity = $(this).data('slider.position') ? 1 : 1 - Math.abs(data.dx) / $(this).width();
+					$(this).css({left: left, opacity: opacity, zIndex: zIndex});
+				});
+		},
+		finish: function(data) {
+			if(
+				(Math.abs(data.dx) > data.currentSlide.width() * data.factor) &&
+				(data.dir ? (Math.sign(data.dx) == data.dir) : true) &&
+				(!data.stay)
+			) {
+				data.way = 0;
+			} else {
+				data.way = 1;
+				data.stay = true;
+			}
+// 			
+			if (!data.dx)
+				return;
+			
+			if (!data.slidingOffset)
+				data.slidingOffset = Math.sign(data.dx);
+			
+			self = this;
+			
+			data.activeSlides.not(data.currentSlide).each(function() {
+				var left = $(this).data('slider.position') != Math.sign(data.dx) ? 0 : $(this).position().left;
+				var zIndex = $(this).data('slider.position') ? 0 : 100;
+				$(this).css({left: left, zIndex: zIndex});
+			});
+			
+			console.log(data.way);
+			data.currentSlide.animate({
+				opacity: data.way
+			}, {
+				duration: 30000,
+				easing : data.easing,
+				complete : function() {
+					$(this).css({left: Math.sign(data.dx) * self.slider.width(), opacity: 1});
+					self._complete(this, data);
+				}
+			});
 		}
 	};
 	
