@@ -6,4 +6,13 @@ img {
 	width: 500px;
 	height: 293px;
 	background-color: red;
+	float: left;
+}
+
+.parameters {
+	float: left;
+}
+
+br {
+	clear: both;
 }

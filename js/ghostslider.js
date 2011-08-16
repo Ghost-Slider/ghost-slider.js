@@ -425,7 +425,7 @@
 			self = this;
 
 			data.activeSlides
-					.animate(
+					.stop().animate(
 						{
 							left : '+=' + data.way
 						}, {
@@ -438,13 +438,6 @@
 
 	$.fn.ghostslider.animations.fade = {
 		slide: function(slides, data) {
-			slides
-				.each(function() {
-					var left = $(this).data('slider.position') != Math.sign(data.dx) ? 0 : $(this).position().left;
-					var zIndex = $(this).data('slider.position') ? 0 : 100;
-					var opacity = $(this).data('slider.position') ? 1 : 1 - Math.abs(data.dx) / $(this).width();
-					$(this).css({left: left, opacity: opacity, zIndex: zIndex});
-				});
 		},
 		finish: function(data) {
 			if(
@@ -457,31 +450,29 @@
 				data.way = 1;
 				data.stay = true;
 			}
-//
-			if (!data.dx)
-				return;
 
 			if (!data.slidingOffset)
 				data.slidingOffset = Math.sign(data.dx);
 
 			self = this;
 
-			data.activeSlides.not(data.currentSlide).each(function() {
+			data.activeSlides.each(function() {
 				var left = $(this).data('slider.position') != Math.sign(data.dx) ? 0 : $(this).position().left;
 				var zIndex = $(this).data('slider.position') ? 0 : 100;
 				$(this).css({left: left, zIndex: zIndex});
 			});
 
-			data.currentSlide.animate({
-				opacity: data.way
-			}, {
-				duration: 3000,
-				easing : data.easing,
-				complete : function() {
-					$(this).css({left: Math.sign(data.dx) * self.slider.width(), opacity: 1});
-					self._complete(this, data);
-				}
-			});
+			if (!data.way)
+				data.currentSlide.stop().animate({
+					opacity: data.way
+				}, {
+					duration: 750,
+					easing : data.easing,
+					complete : function() {
+						$(this).css({left: Math.sign(data.dx) * self.slider.width(), opacity: 1});
+						self._complete(this, data);
+					}
+				});
 		}
 	};
 
