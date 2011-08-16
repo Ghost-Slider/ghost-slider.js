@@ -4,13 +4,13 @@
  */
 
 (function($) {
-	
+
 	if (!Math.sign) {
 		Math.sign = function(_in) {
 			return _in < 0 ? -1 : 1;
 		};
 	}
-	
+
 	/**
 	 * Normalizes touch events
 	 */
@@ -39,7 +39,7 @@
 		});
 		return m;
 	};
-	
+
 	/**
 	 * Array.slice for pseudo arrays.
 	 */
@@ -51,7 +51,7 @@
 			result.push(parray[i]);
 		return result;
 	}
-	
+
 	/**
 	 * Slider Class
 	 */
@@ -61,7 +61,7 @@
 		timer: undefined,
 		reverse: [],
 		animation: undefined,
-		
+
 		/**
 		 * Initialize the slider.
 		 */
@@ -96,13 +96,13 @@
 							.css({left: f * $(this).parent().width()});
 					})
 					.bind('touchstart touchend touchmove mousedown mousemove mouseup', $.proxy(this, '_touchHandler'));
-					
+
 			this.start();
-			
+
 			var animation = elem.attr('data-slider-effect') || 'slide';
 			this.animation = $.fn.ghostslider.animations[animation];
 		},
-		
+
 		/**
 		 * Handles clicks on hyperlinks.
 		 */
@@ -111,7 +111,7 @@
 				return;
 			evt.stopPropagation();
 		},
-		
+
 		/**
 		 * Breaks touch propagation.
 		 */
@@ -128,7 +128,7 @@
 				return true;
 			}
 		},
-		
+
 		/**
 		 * Prehandler for slide events.
 		 */
@@ -138,22 +138,22 @@
 				return;
 			return this['_' + evt.type](evt);
 		},
-		
+
 		/**
 		 * Mouse support.
 		 */
 		_mousedown: function(evt) { return this._touchstart(evt); },
-		
+
 		/**
 		 * Mouse support.
 		 */
 		_mouseup: function(evt) { return this._touchend(evt); },
-		
+
 		/**
 		 * Mouse support.
 		 */
 		_mousemove: function(evt) { return evt.which ? this._touchmove(evt) : false; },
-		
+
 		/**
 		 * Prepares for sliding.
 		 */
@@ -169,7 +169,7 @@
 				$(this).data('slider.left', $(this).position().left);
 			});
 		},
-		
+
 		/**
 		 * Finger chasing movement.
 		 */
@@ -190,15 +190,15 @@
 			this.animation.slide.call(this, MeAndMyNeighbors($(evt.currentTarget)), this);
 			this.slider.trigger('sliding', this.dx);
 		},
-		
+
 		_touchend: function(evt) {
-			
+
 			var data = {};
-			
+
 			data.currentSlide = $(evt.currentTarget);
 			data.activeSlides = MeAndMyNeighbors(data.currentSlide);
-			
-			
+
+
 			data.dx = this.dx;
 			data.curX = evt.pageX;
 			data.time = this.time;
@@ -206,12 +206,12 @@
 			data.factor = false;
 			data.way = 0;
 			data.stay = this.breakSlide ? true : false;
-			
+
 			data.all = this.slider.children().length;
 			data.max = Math.floor(data.all / 2);
 			data.min = -data.max + (data.all % 2 ? 0 : 1);
 			data.slidingOffset = false;
-			
+
 			data.dir = 0;
 			data.bounce = (data.all < 3) || (
 				(this.slider.attr('data-slider-carousel') == 'false') &&
@@ -219,34 +219,34 @@
 			);
 			data.easing = this.slider.attr('data-slider-easing') || 'easeOutExpo';
 			data.now = evt.timeStamp;
-			
+
 			if (data.bounce)
 				data.dir = -Math.sign(data.activeSlides.not(data.currentSlide).data('slider.position'));
 			if (data.all == 1)
 				data.dir = 2;
-				
-			
+
+
 			if (data.time)
 				data.factor = (data.now - data.time) / 2000 * 0.1;
 			if(data.factor > 0.5)
 				data.factor = 0.5;
-				
+
 			this._cleanUp();
 			this.animation.finish.call(this, data);
 		},
-		
+
 		_cleanUp: function() {
 			this.slider.children().each(function() {
 				$(this).removeData('slider.left');
 			});
 		},
-		
+
 		_complete: function(slide, data) {
 			if (data.stay || this.breakSlide)
 				return;
-		
+
 			slide = $(slide);
-			
+
 			var txt = '';
 			if ( !slide.siblings(':animated').length) {
 				slide.siblings().andSelf().each(function() {
@@ -269,16 +269,16 @@
 			}
 			this.slider.trigger('slidecomplete', [this.hasLeft(), this.hasRight(), slide]);
 		},
-		
+
 		getCurrentSlide: function() {
 			return this.slider.children().filter(function() { return $(this).data('slider.position') == 0; });
 		},
-		
+
 		_has: function(dir) {
 			all = this.slider.children().length;
 			if (all == 1)
 				return false;
-			
+
 			currentSlide = this.getCurrentSlide();
 			activeSlides = MeAndMyNeighbors(currentSlide);
 			if (
@@ -292,33 +292,33 @@
 			}
 			return true;
 		},
-		
+
 		hasLeft: function() {
 			return this._has(1);
 		},
-		
+
 		hasRight: function() {
 			return this._has(-1);
 		},
-		
+
 		left: function() {
 			this.moveTo(
 				this.slider.children().filter(function() { return $(this).data('slider.position') == -1; })
 			);
 		},
-		
+
 		right: function() {
 			this.moveTo(
 				this.slider.children().filter(function() { return $(this).data('slider.position') == 1; })
 			);
 		},
-		
+
 		moveTo: function(slide) {
 			if (typeof slide != 'object')
 				slide = this.slider.children('[' + Slider.indexAttr + '=' + slide + ']');
-			
+
 			var data = {};
-			
+
 			data.currentSlide = this.getCurrentSlide();
 			s1 = slide.data('slider.position');
 			s2 = data.currentSlide.data('slider.position');
@@ -326,9 +326,9 @@
 				n = $(this).data('slider.position');
 				return (s1 > s2) ? n < 1 : n > -1;
 			}).add(slide);
-			
+
 			data.slidingOffset = -s1;
-			
+
 			data.dx = -s1;
 			data.curX = 0;
 			data.time = 0;
@@ -336,11 +336,11 @@
 			data.factor = 0;
 			data.way = 0;
 			data.stay = false;
-			
+
 			data.all = this.slider.children().length;
 			data.max = Math.floor(data.all / 2);
 			data.min = -data.max + (data.all % 2 ? 0 : 1);
-			
+
 			data.dir = 0;
 			data.bounce = (data.all < 3) || (
 				(this.slider.attr('data-slider-carousel') == 'false') &&
@@ -348,31 +348,31 @@
 			);
 			data.easing = this.slider.attr('data-slider-easing') || 'easeOutExpo';
 			data.now = 0;
-			
+
 			if (data.bounce)
 				data.dir = -Math.sign(data.activeSlides.not(data.currentSlide).data('slider.position'));
 			if (data.all == 1)
 				data.dir = 2;
-			
+
 			this._cleanUp();
 			this.animation.finish.call(this, data);
 		},
-		
+
 		start: function(interval) {
 			if (!interval)
 				interval = this.slider.attr('data-slider-autoslide-interval');
 			else
 				this.slider.attr('data-slider-autoslide-interval', interval);
-			
+
 			if (interval) {
 				var self = this;
-				var dir = elem.attr('data-slider-autoslide-direction');
+				var dir = this.slider.attr('data-slider-autoslide-direction');
 				if (!dir)
 					dir = 'right';
 				this.timer = window.setInterval(function() { self[dir](); }, parseInt(interval));
 			}
 		},
-		
+
 		stop: function() {
 			if (this.timer) {
 				clearInterval(this.timer);
@@ -380,7 +380,7 @@
 			}
 		}
 	};
-	
+
 	$.fn.ghostslider = function(method) {
 		// Is Method Call
 		if (typeof method === 'string') {
@@ -394,7 +394,7 @@
 		}
 		return this;
 	};
-	
+
 	$.fn.ghostslider.animations = {};
 	$.fn.ghostslider.animations.slide = {
 		slide: function(slides, data) {
@@ -415,15 +415,15 @@
 				data.way = data.oldLeft - data.currentSlide.position().left;
 				data.stay = true;
 			}
-// 			
+//
 			if (!data.way)
 				return;
-			
+
 			if (!data.slidingOffset)
 				data.slidingOffset = Math.sign(data.way);
-			
+
 			self = this;
-			
+
 			data.activeSlides
 					.animate(
 						{
@@ -435,7 +435,7 @@
 					);
 		}
 	};
-	
+
 	$.fn.ghostslider.animations.fade = {
 		slide: function(slides, data) {
 			slides
@@ -457,21 +457,21 @@
 				data.way = 1;
 				data.stay = true;
 			}
-// 			
+//
 			if (!data.dx)
 				return;
-			
+
 			if (!data.slidingOffset)
 				data.slidingOffset = Math.sign(data.dx);
-			
+
 			self = this;
-			
+
 			data.activeSlides.not(data.currentSlide).each(function() {
 				var left = $(this).data('slider.position') != Math.sign(data.dx) ? 0 : $(this).position().left;
 				var zIndex = $(this).data('slider.position') ? 0 : 100;
 				$(this).css({left: left, zIndex: zIndex});
 			});
-			
+
 			data.currentSlide.animate({
 				opacity: data.way
 			}, {
@@ -484,7 +484,7 @@
 			});
 		}
 	};
-	
+
 	if (!window.OhGodPleaseNoAutoload)
 		$(function() { $('.slideshow').ghostslider(); });
 })(jQuery);
