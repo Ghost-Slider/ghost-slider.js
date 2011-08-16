@@ -97,16 +97,10 @@
 					})
 					.bind('touchstart touchend touchmove mousedown mousemove mouseup', $.proxy(this, '_touchHandler'));
 					
-			var intervall = elem.attr('data-slider-autoslide-intervall');
-			if (intervall) {
-				var self = this;
-				var dir = elem.attr('data-slider-autoslide-direction');
-				if (!dir)
-					dir = 'right';
-				this.timer = window.setInterval(function() { self[dir](); }, parseInt(intervall));
-			}
+			this.start();
 			
-			this.animation = $.fn.ghostslider.animations.slide;
+			var animation = elem.attr('data-slider-effect') || 'slide';
+			this.animation = $.fn.ghostslider.animations[animation];
 		},
 		
 		/**
@@ -165,6 +159,7 @@
 		 */
 		_touchstart: function(evt) {
 			this.p0 = {left: evt.pageX, top: evt.pageY};
+			this.stop();
 			this.time = evt.timeStamp;
 			this.dx = 0;
 			this.dy = 0;
@@ -185,8 +180,8 @@
 				this.p0 = $(evt.currentTarget).position();
 			dx = evt.pageX - this.p0.left;
 			dy = evt.pageY - this.p0.top;
-			if (this.reverse.length || (this.dx > dx))
-				this.reverse.push(this.dx);
+			/*if (this.reverse.length || (this.dx > dx))
+				this.reverse.push(this.dx);*/
 			this.dx = dx;
 			this.dy = this.forceSlide ? 0 : dy;
 			if (Math.abs(this.dy) > Math.abs(this.dx))
@@ -362,6 +357,28 @@
 			this._cleanUp();
 			this.animation.finish.call(this, data);
 		},
+		
+		start: function(interval) {
+			if (!interval)
+				interval = this.slider.attr('data-slider-autoslide-interval');
+			else
+				this.slider.attr('data-slider-autoslide-interval', interval);
+			
+			if (interval) {
+				var self = this;
+				var dir = elem.attr('data-slider-autoslide-direction');
+				if (!dir)
+					dir = 'right';
+				this.timer = window.setInterval(function() { self[dir](); }, parseInt(interval));
+			}
+		},
+		
+		stop: function() {
+			if (this.timer) {
+				clearInterval(this.timer);
+				this.timer = false;
+			}
+		}
 	};
 	
 	$.fn.ghostslider = function(method) {
@@ -382,9 +399,9 @@
 	$.fn.ghostslider.animations.slide = {
 		slide: function(slides, data) {
 			slides
-				.each(function() {
-					var left = $(this).data('slider.left');
-					$(this).css({left: left + data.dx});
+				.each(function(i) {
+					var left = $(this).data('slider.left') + data.dx;
+					$(this).css({left: left});
 				});
 		},
 		finish: function(data) {
@@ -455,11 +472,10 @@
 				$(this).css({left: left, zIndex: zIndex});
 			});
 			
-			console.log(data.way);
 			data.currentSlide.animate({
 				opacity: data.way
 			}, {
-				duration: 30000,
+				duration: 3000,
 				easing : data.easing,
 				complete : function() {
 					$(this).css({left: Math.sign(data.dx) * self.slider.width(), opacity: 1});

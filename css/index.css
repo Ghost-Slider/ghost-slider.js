@@ -2,24 +2,8 @@ img {
 	width: 100% !important;
 }
 
-#orange-d {
-	width: 970px;
-	height: 330px;
-}
-
-.prev, .next {
-	height: 330px;
-	display: table-cell;
-	background-color: gray;
-	cursor: pointer;
-	vertical-align: middle;
-	-webkit-user-select: none;
-	-webkit-user-drag: none;
-	width: 25px;
-	text-align: center;
-}
-
-#wordpress {
-	width: 700px;
-	height: 330px;
+.twentyeleven {
+	width: 500px;
+	height: 293px;
+	background-color: red;
 }
