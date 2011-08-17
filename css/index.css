@@ -2,11 +2,33 @@ img {
 	width: 100% !important;
 }
 
-.twentyeleven {
+.slideshow-container {
+	float: left;
+	text-align: center;
+	position: relative;
+}
+
+.slideshow-ui.slidelist.circles {
+	position: absolute;
+	top: 250px;
+	width: 100%;
+}
+
+.slideshow-ui.slidelist:not(.circles) {
+	display: inline-block;
+}
+
+.slideshow-ui.slide-left {
+	float: left;
+}
+
+.slideshow-ui.slide-right {
+	float: right;
+}
+
+.slideshow {
 	width: 500px;
 	height: 293px;
-	background-color: red;
-	float: left;
 }
 
 .parameters {

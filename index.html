@@ -7,10 +7,12 @@
 		<meta name="viewport" content="initial-scale=1.0" />
 		<title> Ghostslider </title>
 		<link rel="stylesheet" type="text/css" href="css/ghostslider.css" />
+		<link rel="stylesheet" type="text/css" href="css/ghostsliderui.css" />
 		<link rel="stylesheet" type="text/css" href="css/index.css" />
 		<script type="text/javascript" src="js/jquery-1.6.2.js"></script>
 		<script type="text/javascript" src="js/jquery.easing.1.3.js"></script>
 		<script type="text/javascript" src="js/ghostslider.js"></script>
+		<script type="text/javascript" src="js/ghostsliderui.js"></script>
  		<script type="text/javascript">
 			$(function() {
 				$('h1').text($(document).width());
@@ -30,7 +32,8 @@
 	<body>
 		<h1> HOY </h1>
 		<h2> Default Values </h2>
-			<ul class="slideshow twentyeleven">
+		<div class="slideshow-container">
+			<ul class="slideshow" id="default-values">
 				<li>
 					<img src="http://placekitten.com/500/300" alt="trolley" />
 				</li>
@@ -56,21 +59,31 @@
 					<img src="http://placekitten.com/500/293" alt="willow" />
 				</li>
 			</ul>
-			<dl class="parameters">
-				<dt>data-slider-carousel</dt>
-				<dd>true</dd>
-				<dt>data-slider-autoslide-interval</dt>
-				<dd>false</dd>
-				<dt>data-slider-autoslide-direction</dt>
-				<dd>left</dd>
-				<dt>data-slider-effect</dt>
-				<dd>slide</dd>
-				<dt>data-slider-easing</dt>
-				<dd>easeOutExpo</dd>
-			</dl>
+			<div class="slideshow-ui slidelist circles" data-slider="#default-values" data-generator="$.fn.ghostslider.ui.generators.circles"></div>
+			
+			<div class="slideshow-ui slide-left" data-slider="#default-values">&#x25c0;</div>
+			<div class="slideshow-ui slide-right" data-slider="#default-values">&#x25b6;</div>
+			<div class="slideshow-ui slidelist" data-slider="#default-values" data-generator="$.fn.ghostslider.ui.generators.numberedSquares"></div>
+			<br/>
+			<div class="slideshow-ui autoslide-toggle" data-interval="3000" data-start="&#x25b6;" data-stop="&#x275a;&#x275a;" data-slider="#default-values">ddd</div>
+		</div>
+		<dl class="parameters">
+			<dt>data-slider-carousel</dt>
+			<dd>true</dd>
+			<dt>data-slider-autoslide-interval</dt>
+			<dd>false</dd>
+			<dt>data-slider-autoslide-direction</dt>
+			<dd>left</dd>
+			<dt>data-slider-effect</dt>
+			<dd>slide</dd>
+			<dt>data-slider-easing</dt>
+			<dd>easeOutExpo</dd>
+		</dl>
 		<br/>
+		<!--
 		<h2> data-slider-carousel="false" </h2>
-			<ul class="slideshow twentyeleven" data-slider-carousel="false">
+		<div class="slideshow-container">
+			<ul class="slideshow" id="carousel-false" data-slider-carousel="false">
 				<li>
 					<img src="http://placekitten.com/500/300" alt="trolley" />
 				</li>
@@ -96,19 +109,28 @@
 					<img src="http://placekitten.com/500/293" alt="willow" />
 				</li>
 			</ul>
-			<dl class="parameters">
-				<dt>data-slider-carousel</dt>
-				<dd><em>false</em></dd>
-				<dt>data-slider-autoslide-interval</dt>
-				<dd>false</dd>
-				<dt>data-slider-autoslide-direction</dt>
-				<dd>left</dd>
-				<dt>data-slider-effect</dt>
-				<dd>slide</dd>
-				<dt>data-slider-easing</dt>
-				<dd>easeOutExpo</dd>
-			</dl>
+			<div class="slideshow-ui slidelist circles" data-slider="#carousel-false" data-generator="$.fn.ghostslider.ui.generators.circles"></div>
+			
+			<div class="slideshow-ui slide-left" data-slider="#carousel-false">&#x25c0;</div>
+			<div class="slideshow-ui slide-right" data-slider="#carousel-false">&#x25b6;</div>
+			<div class="slideshow-ui slidelist" data-slider="#carousel-false" data-generator="$.fn.ghostslider.ui.generators.numberedSquares"></div>
+			<br/>
+			<div class="slideshow-ui autoslide-toggle" data-start="&#x25b6;" data-stop="&#x275a;&#x275a;" data-slider="#carousel-false">ddd</div>
+		</div>
+		<dl class="parameters">
+			<dt>data-slider-carousel</dt>
+			<dd><em>false</em></dd>
+			<dt>data-slider-autoslide-interval</dt>
+			<dd>false</dd>
+			<dt>data-slider-autoslide-direction</dt>
+			<dd>left</dd>
+			<dt>data-slider-effect</dt>
+			<dd>slide</dd>
+			<dt>data-slider-easing</dt>
+			<dd>easeOutExpo</dd>
+		</dl>
 		<br/>
+		<!--
 		<h2> data-slider-autoslide-interval="5000" </h2>
 			<ul class="slideshow twentyeleven" data-slider-autoslide-interval="5000">
 				<li>
@@ -149,6 +171,7 @@
 				<dd>easeOutExpo</dd>
 			</dl>
 		<br/>
+		<!--
 		<h2> data-slider-autoslide-interval="5000" &amp; data-slider-autoslide-direction="left" </h2>
 			<ul class="slideshow twentyeleven" data-slider-autoslide-interval="5000" data-slider-autoslide-direction="left">
 				<li>
@@ -189,6 +212,7 @@
 				<dd>easeOutExpo</dd>
 			</dl>
 		<br/>
+		<!--
 		<h2> data-slider-effect="fade" </h2>
 			<ul class="slideshow twentyeleven" data-slider-effect="fade" data-slider-autoslide-interval="5000" data-slider-easing="linear">
 				<li>
@@ -229,6 +253,7 @@
 				<dd><em>linear</em></dd>
 			</dl>
 		<br/>
+		<!--
 		<h2> data-slider-easing="easeOutElastic" </h2>
 			<ul class="slideshow twentyeleven" data-slider-easing="easeOutElastic">
 				<li>
@@ -269,5 +294,6 @@
 				<dd><em>easeOutElastic</em></dd>
 			</dl>
 		<br/>
+		--></br/>
 	</body>
 </html>

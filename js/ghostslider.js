@@ -247,27 +247,27 @@
 
 			slide = $(slide);
 
-			var txt = '';
 			if ( !slide.siblings(':animated').length) {
 				slide.siblings().andSelf().each(function() {
 					var i = $(this).data('slider.position');
-					txt += i + ' => ';
 					i += data.slidingOffset;
 					if (
 						($(this).parent().attr('data-slider-carousel') != 'false') &&
 						(data.activeSlides.length > 2)
 					) {
 						if (i < data.min)
-							i = data.max;
+							i = Math.abs(data.slidingOffset) < 2 ? data.max : i - (data.min - 1) + data.max;
 						else if (i > data.max)
-							i = data.min;
+							i = Math.abs(data.slidingOffset) < 2 ? data.min : i - (data.max + 1) + data.min;
 					}
-					txt += i + ' (';
 					var f = Math.abs(i) > 1 ? Math.sign(i) : i;
 					$(this).data('slider.position', i).css({left: f * $(this).parent().innerWidth()});
 				});
+				slide = slide.siblings().andSelf().filter(function() {
+					return $(this).data('slider.position') == 0;
+				});
+				this.slider.trigger('slidecomplete', [this.hasLeft(), this.hasRight(), slide]);
 			}
-			this.slider.trigger('slidecomplete', [this.hasLeft(), this.hasRight(), slide]);
 		},
 
 		getCurrentSlide: function() {
@@ -378,6 +378,10 @@
 				clearInterval(this.timer);
 				this.timer = false;
 			}
+		},
+		
+		isAutosliding: function() {
+			return (!!this.timer);
 		}
 	};
 
@@ -422,7 +426,7 @@
 			if (!data.slidingOffset)
 				data.slidingOffset = Math.sign(data.way);
 
-			self = this;
+			var self = this;
 
 			data.activeSlides
 					.stop().animate(
@@ -454,7 +458,7 @@
 			if (!data.slidingOffset)
 				data.slidingOffset = Math.sign(data.dx);
 
-			self = this;
+			var self = this;
 
 			data.activeSlides.each(function() {
 				var left = $(this).data('slider.position') != Math.sign(data.dx) ? 0 : $(this).position().left;
