@@ -407,6 +407,7 @@
 		 * @param interval A new interval for the autoslider timer (optional).
 		 */
 		start: function(interval) {
+			console.log('start ' + interval);
 			if (!interval)
 				interval = this.slider.attr('data-slider-autoslide-interval');
 			else
@@ -453,7 +454,7 @@
 			var args = slice(arguments, 1);
 			var slider = this.eq(0).data('slider');
 			var r = slider[method].apply(slider, args);
-			return r ? r : this;
+			return r != undefined ? r : this;
 		} else {
 			this.each(function() {
 				var slider = new Slider($(this));
