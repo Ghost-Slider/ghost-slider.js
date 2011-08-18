@@ -9,8 +9,22 @@ img {
 }
 
 .slideshow {
-	width: 500px;
-	height: 293px;
+	width: 980px;
+	height: 575px;
+}
+
+@media only screen and (max-width: 320px) {
+	.slideshow {
+		width: 300px;
+		height: 175px;
+	}
+}
+
+@media only screen and (min-width: 480px) and (max-width: 800px) {
+	.slideshow {
+		width: 460px;
+		height: 270px;
+	}
 }
 
 .parameters {
