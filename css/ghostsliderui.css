@@ -52,7 +52,11 @@
 	background-color: rgba(255, 255, 255, 0.8);
 }
 
-@media screen and (max-width: 980px) {
+@media only screen and (-webkit-min-device-pixel-ratio: 2) {
+	.slideshow-ui { display: none !important; }
+}
+
+@media (touch-enabled),(-webkit-touch-enabled),(-moz-touch-enabled),(-o-touch-enabled),(-khtml-touch-enabled),(-ms-touch-enabled) {
 	.slideshow-ui { display: none !important; }
 }
 

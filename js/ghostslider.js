@@ -6,6 +6,11 @@
 (function($) {
 
 	if (!Math.sign) {
+		/**
+		 * Determines the sign of a number.
+		 * @param _in Number to check.
+		 * @return -1 for negative numbers, 1 for everything else.
+		 */
 		Math.sign = function(_in) {
 			return _in < 0 ? -1 : 1;
 		};
@@ -87,7 +92,7 @@
 					});
 				})
 				.find('a').bind('touchstart touchend', $.proxy(this, '_clickHandler')).end()
-				//.find('img').bind('dragstart', function() { return false; }).end()
+				.find('img').bind('dragstart', function() { return false; }).end()
 				.children()
 					.each(function(n) {
 						var i = n;
@@ -197,6 +202,9 @@
 			this.slider.trigger('sliding', this.dx);
 		},
 
+		/**
+		 * Finalization of touch movements.
+		 */
 		_touchend: function(evt) {
 
 			var data = {};
@@ -242,12 +250,19 @@
 			this.animation.finish.call(this, data);
 		},
 
+		/**
+		 * Delete some temporary data.
+		 */
 		_cleanUp: function() {
 			this.slider.children().each(function() {
 				$(this).removeData('slider.left');
 			});
 		},
 
+		/**
+		 * The final sliding routine. Takes care of final placements and assigns new
+		 * positions if necessary.
+		 */
 		_complete: function(slide, data) {
 			if (data.stay || this.breakSlide)
 				return;
@@ -277,10 +292,16 @@
 			}
 		},
 
+		/**
+		 * Returns the currently visible slide.
+		 */
 		getCurrentSlide: function() {
 			return this.slider.children().filter(function() { return $(this).data('slider.position') == 0; });
 		},
 
+		/**
+		 * Checks if a neighbor exists.
+		 */
 		_has: function(dir) {
 			all = this.slider.children().length;
 			if (all == 1)
@@ -300,26 +321,42 @@
 			return true;
 		},
 
+		/**
+		 * Checks for a left neighbor.
+		 */
 		hasLeft: function() {
 			return this._has(1);
 		},
 
+		/**
+		 * Checks for a right neighbor.
+		 */
 		hasRight: function() {
 			return this._has(-1);
 		},
 
+		/**
+		 * Slides to the left.
+		 */
 		left: function() {
 			this.moveTo(
 				this.slider.children().filter(function() { return $(this).data('slider.position') == -1; })
 			);
 		},
-
+		
+		/**
+		 * Slides to the right.
+		 */
 		right: function() {
 			this.moveTo(
 				this.slider.children().filter(function() { return $(this).data('slider.position') == 1; })
 			);
 		},
 
+		/**
+		 * Slides to a given slide.
+		 * @param slide The index of the slide (beginning with 0) or the jquery object of the slide.
+		 */
 		moveTo: function(slide) {
 			if (typeof slide != 'object')
 				slide = this.slider.children('[' + Slider.indexAttr + '=' + slide + ']');
@@ -365,6 +402,10 @@
 			this.animation.finish.call(this, data);
 		},
 
+		/**
+		 * Starts the autoslider.
+		 * @param interval A new interval for the autoslider timer (optional).
+		 */
 		start: function(interval) {
 			if (!interval)
 				interval = this.slider.attr('data-slider-autoslide-interval');
@@ -380,6 +421,9 @@
 			}
 		},
 
+		/**
+		 * Stops the autoslider.
+		 */
 		stop: function() {
 			if (this.timer) {
 				clearInterval(this.timer);
@@ -387,17 +431,29 @@
 			}
 		},
 		
+		/**
+		 * Checks if the autoslider is active.
+		 * @return True if the autoslider is active, false otherwise.
+		 */
 		isAutosliding: function() {
 			return (!!this.timer);
 		}
 	};
 
+	/**
+	 * The actual jquery method.
+	 * If the first parameter is string we'll try and call a method of the slider with
+	 * the remaining parameters, otherwise we'll just initiate it.
+	 * @param method A method name (optional).
+	 * @param ... Parameters for the method (optional).
+	 */
 	$.fn.ghostslider = function(method) {
 		// Is Method Call
 		if (typeof method === 'string') {
 			var args = slice(arguments, 1);
 			var slider = this.eq(0).data('slider');
-			return slider[method].apply(slider, args);
+			var r = slider[method].apply(slider, args);
+			return r ? r : this;
 		} else {
 			this.each(function() {
 				var slider = new Slider($(this));
@@ -406,6 +462,9 @@
 		return this;
 	};
 
+	/**
+	 * Our animation namespace. Ugly, eh?
+	 */
 	$.fn.ghostslider.animations = {};
 	$.fn.ghostslider.animations.slide = {
 		slide: function(slides, data) {
@@ -487,6 +546,9 @@
 		}
 	};
 
+	/**
+	 * I bet someone will be offended by this...
+	 */
 	if (!window.OhGodPleaseNoAutoload)
 		$(function() { $('.slideshow').ghostslider(); });
 })(jQuery);
