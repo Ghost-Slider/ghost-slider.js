@@ -1,9 +1,29 @@
 .slideshow-ui {
 	cursor: pointer;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+.slideshow-ui.slide-left {
+	float: left;
+}
+
+.slideshow-ui.slide-right {
+	float: right;
 }
 
 .slideshow-ui.slidelist {
 	display: block;
+}
+
+.slideshow-ui.slidelist:not(.circles) {
+	display: inline-block;
+}
+
+.slideshow-ui.slidelist.circles {
+	position: absolute;
+	top: 30px;
+	width: 100%;
 }
 
 .slideshow-ui.slidelist > .square {
@@ -25,9 +45,22 @@
 	border-radius: 50%;
 	margin: 0px 2px;
 	cursor: pointer;
-	background-color: rgba(100, 100, 255, 0.3);
+	background-color: rgba(255, 255, 255, 0.3);
 }
 
 .slideshow-ui.slidelist > .circle.current {
-	background-color: rgba(100, 100, 255, 0.8);
+	background-color: rgba(255, 255, 255, 0.8);
+}
+
+.slideshow > figure > figcaption {
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 38px;
+	background-color: rgba(255, 255, 255, 0.4);
+	font-family: Ubuntu, Arial, sans-serif;
+	font-weight: bold;
+	display: block;
+	padding-top: 15px;
 }

@@ -34,7 +34,7 @@
 			var $this = $(this);
 			var interval = $this.attr('data-interval');
 			if (interval)
-				interval = parseInt(data-interval);
+				interval = parseInt(interval);
 			else
 				interval = undefined;
 			var slider = $($this.attr('data-slider'));

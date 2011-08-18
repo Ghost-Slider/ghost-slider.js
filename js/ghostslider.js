@@ -59,7 +59,7 @@
 	Slider.indexAttr = 'data-slider-index';
 	Slider.prototype = {
 		timer: undefined,
-		reverse: [],
+		maxdx: 0,
 		animation: undefined,
 
 		/**
@@ -84,6 +84,7 @@
 					});
 				})
 				.find('a').bind('touchstart touchend', $.proxy(this, '_clickHandler')).end()
+				.find('img').bind('dragstart', function() { return false; }).end()
 				.children()
 					.each(function(n) {
 						var i = n;
@@ -163,6 +164,7 @@
 			this.time = evt.timeStamp;
 			this.dx = 0;
 			this.dy = 0;
+			this.maxdx = 0;
 			this.breakSlide = false;
 			this.forceSlide = false;
 			this.slider.children().stop(true, true).each(function() {
@@ -178,12 +180,10 @@
 				return;
 			if (!this.p0)
 				this.p0 = $(evt.currentTarget).position();
-			dx = evt.pageX - this.p0.left;
-			dy = evt.pageY - this.p0.top;
-			/*if (this.reverse.length || (this.dx > dx))
-				this.reverse.push(this.dx);*/
-			this.dx = dx;
-			this.dy = this.forceSlide ? 0 : dy;
+			this.dx = evt.pageX - this.p0.left;
+			if (Math.abs(this.dx) > Math.abs(this.maxdx))
+				this.maxdx = this.dx;
+			this.dy = this.forceSlide ? 0 : evt.pageY - this.p0.top;
 			if (Math.abs(this.dy) > Math.abs(this.dx))
 				return;
 			this.forceSlide = true;
@@ -199,7 +199,8 @@
 			data.activeSlides = MeAndMyNeighbors(data.currentSlide);
 
 
-			data.dx = this.dx;
+			data.dx = Math.abs(this.dx) > Math.abs(this.maxdx) ? this.dx : (Math.abs(this.dx) + Math.abs(this.maxdx)
+			* -Math.sign(this.dx));
 			data.curX = evt.pageX;
 			data.time = this.time;
 			data.oldLeft = data.currentSlide.data('slider.left');
