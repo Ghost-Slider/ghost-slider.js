@@ -71,6 +71,9 @@
 			var bounce = (all < 3) || (elem.attr('data-slider-carousel') == 'false');
 			var max = Math.floor(all / 2);
 			var min = max - all;
+			var dragEvents = 'touchstart touchend touchmove';
+			if (elem.attr('data-slider-allowmouse') == 'true')
+				dragEvents += ' mousedown mousemove mouseup';
 			elem
 				.data('slider', this)
 				.bind('touchstart touchmove mousedown mouseup', $.proxy(this, '_touchBreak'))
@@ -84,7 +87,7 @@
 					});
 				})
 				.find('a').bind('touchstart touchend', $.proxy(this, '_clickHandler')).end()
-				.find('img').bind('dragstart', function() { return false; }).end()
+				//.find('img').bind('dragstart', function() { return false; }).end()
 				.children()
 					.each(function(n) {
 						var i = n;
@@ -96,7 +99,7 @@
 							.attr(Slider.indexAttr, n)
 							.css({left: f * $(this).parent().width()});
 					})
-					.bind('touchstart touchend touchmove mousedown mousemove mouseup', $.proxy(this, '_touchHandler'));
+					.bind(dragEvents, $.proxy(this, '_touchHandler'));
 
 			this.start();
 
@@ -181,7 +184,10 @@
 			if (!this.p0)
 				this.p0 = $(evt.currentTarget).position();
 			this.dx = evt.pageX - this.p0.left;
-			if (Math.abs(this.dx) > Math.abs(this.maxdx))
+			if (
+				(Math.sign(this.dx) != Math.sign(this.maxdx)) ||
+				(Math.abs(this.dx) > Math.abs(this.maxdx))
+			)
 				this.maxdx = this.dx;
 			this.dy = this.forceSlide ? 0 : evt.pageY - this.p0.top;
 			if (Math.abs(this.dy) > Math.abs(this.dx))
@@ -198,9 +204,9 @@
 			data.currentSlide = $(evt.currentTarget);
 			data.activeSlides = MeAndMyNeighbors(data.currentSlide);
 
-
-			data.dx = Math.abs(this.dx) > Math.abs(this.maxdx) ? this.dx : (Math.abs(this.dx) + Math.abs(this.maxdx)
-			* -Math.sign(this.dx));
+			data.dx = Math.abs(this.dx) - Math.abs(this.maxdx) > -5 ?
+							this.dx :
+							(Math.abs(this.dx) + Math.abs(this.maxdx) * -Math.sign(this.dx));
 			data.curX = evt.pageX;
 			data.time = this.time;
 			data.oldLeft = data.currentSlide.data('slider.left');

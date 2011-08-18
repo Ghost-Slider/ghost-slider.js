@@ -4,7 +4,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="expires" content="0" />
-		<meta name="viewport" content="initial-scale=1.0" />
+<!-- 		<meta name="viewport" content="initial-scale=1.0" /> -->
 		<title> Ghostslider </title>
 		<link rel="stylesheet" type="text/css" href="css/ghostslider.css" />
 		<link rel="stylesheet" type="text/css" href="css/ghostsliderui.css" />
@@ -33,7 +33,7 @@
 		<h1> HOY </h1>
 		<h2> Default Values </h2>
 		<div class="slideshow-container">
-			<div class="slideshow" id="default-values">
+			<div class="slideshow" id="default-values" data-slider-allowmouse="true">
 				<figure>
 					<img src="http://placekitten.com/500/300" alt="kitten" />
 					<figcaption>A kitten!</figcaption>
@@ -67,15 +67,17 @@
 					<figcaption>Yet another cat portrait.</figcaption>
 				</figure>
 			</div>
-			<div class="slideshow-ui slidelist circles" data-slider="#default-values" data-generator="$.fn.ghostslider.ui.generators.circles"></div>
+			<div class="slideshow-ui slidelist circles" data-slider="#default-values" data-sliderui-listgenerator="$circles"></div>
 			
 			<div class="slideshow-ui slide-left" data-slider="#default-values">&#x25c0;</div>
 			<div class="slideshow-ui slide-right" data-slider="#default-values">&#x25b6;</div>
-			<div class="slideshow-ui slidelist" data-slider="#default-values" data-generator="$.fn.ghostslider.ui.generators.numberedSquares"></div>
+			<div class="slideshow-ui slidelist" data-slider="#default-values" data-sliderui-listgenerator="$numberedSquares"></div>
 			<br/>
-			<div class="slideshow-ui autoslide-toggle" data-interval="3000" data-start="&#x25b6;" data-stop="&#x275a;&#x275a;" data-slider="#default-values">ddd</div>
+			<div class="slideshow-ui autoslide-toggle" data-sliderui-interval="3000" data-sliderui-starticon="&#x25b6;" data-sliderui-stopicon="&#x275a;&#x275a;" data-slider="#default-values">ddd</div>
 		</div>
 		<dl class="parameters">
+			<dt>data-slider-allowmouse</dt>
+			<dd><em>true</em></dd>
 			<dt>data-slider-carousel</dt>
 			<dd>true</dd>
 			<dt>data-slider-autoslide-interval</dt>

@@ -32,7 +32,7 @@
 		
 		$('.slideshow-ui.autoslide-toggle').click(function(evt) {
 			var $this = $(this);
-			var interval = $this.attr('data-interval');
+			var interval = $this.attr('data-sliderui-interval');
 			if (interval)
 				interval = parseInt(interval);
 			else
@@ -43,19 +43,23 @@
 			} else {
 				slider.ghostslider('start', interval);
 			}
-			$this.html(slider.ghostslider('isAutosliding') ? $this.attr('data-stop') : $this.attr('data-start'));
+			$this.html(slider.ghostslider('isAutosliding') ? $this.attr('data-sliderui-stopicon') : $this.attr('data-sliderui-starticon'));
 		}).each(function() {
 			var $this = $(this);
 			var slider = $($this.attr('data-slider'));
-			$this.html(slider.ghostslider('isAutosliding') ? $this.attr('data-stop') : $this.attr('data-start'));
+			$this.html(slider.ghostslider('isAutosliding') ? $this.attr('data-sliderui-stopicon') : $this.attr('data-sliderui-starticon'));
 		});
 		
 		$('.slideshow-ui.slidelist').each(function() {
 			var widget = $(this);
 			var slider = $(widget.attr('data-slider'));
 			var slides = slider.children();
+			var generatorStr = widget.attr('data-sliderui-listgenerator');
 			var generator = false;
-			var generatorStr = widget.attr('data-generator');
+			if (generatorStr[0] == '$') {
+				generator = $.fn.ghostslider.ui.generators;
+				generatorStr = generatorStr.substr(1);
+			}
 			if (generatorStr.search('.') > -1) {
 				$.each(generatorStr.split('.'), function() {
 					if (!generator) {

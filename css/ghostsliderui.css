@@ -52,6 +52,10 @@
 	background-color: rgba(255, 255, 255, 0.8);
 }
 
+@media screen and (max-width: 980px) {
+	.slideshow-ui { display: none !important; }
+}
+
 .slideshow > figure > figcaption {
 	position: absolute;
 	bottom: 0px;
