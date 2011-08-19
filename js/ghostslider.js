@@ -412,13 +412,17 @@
 				interval = this.slider.attr('data-slider-autoslide-interval');
 			else
 				this.slider.attr('data-slider-autoslide-interval', interval);
+			
+			interval = parseInt(interval);
+			if (!interval)
+				return;
 
 			if (interval) {
 				var self = this;
 				var dir = this.slider.attr('data-slider-autoslide-direction');
 				if (!dir)
 					dir = 'right';
-				this.timer = window.setInterval(function() { self[dir](); }, parseInt(interval));
+				this.timer = window.setInterval(function() { self[dir](); }, interval);
 			}
 		},
 

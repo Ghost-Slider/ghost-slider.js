@@ -2,7 +2,7 @@
  * @author Benjamin Kleiner
  */
 
-(function() {
+(function($) {
 	if (window.OhGodPleaseNoAutoload)
 		return;
 		
