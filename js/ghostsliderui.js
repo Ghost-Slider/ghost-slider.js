@@ -20,34 +20,65 @@
  			r.addClass('current');
  		return r;
  	};
+ 	
+ 	$.fn.ghostslider.ui.leftRightHandler = function(evt, hasLeft, hasRight, slides, animate) {
+ 		var widget = $(this);
+ 		if (animate === undefined)
+	 		var animate = widget.attr('data-ui-animate');
+ 		console.log(animate);
+		var hlr = widget.hasClass('slide-left') ? hasLeft : hasRight;
+		if (!hlr) {
+			if (animate && widget.css('opacity') > 0)
+				widget.animate({opacity: 0}, animate);
+			else
+				widget.css({opacity: 0});
+		} else {
+			if (animate && widget.css('opacity') < 1)
+				widget.animate({opacity: 1}, animate);
+			else
+				widget.css({opacity: 1});
+		}
+	};
 		
 	$(function() {
 		$('.slideshow-ui.slide-left').click(function(evt) {
 			$($(this).attr('data-slider')).ghostslider('left');
+		}).each(function() {
+			var p = $.proxy($.fn.ghostslider.ui.leftRightHandler, this);
+			var slider = $($(this).attr('data-slider'));
+			slider.bind('slidecomplete', p);
+			p(null, slider.ghostslider('hasLeft'), slider.ghostslider('hasRight'), null, false);
 		});
 		
 		$('.slideshow-ui.slide-right').click(function(evt) {
 			$($(this).attr('data-slider')).ghostslider('right');
+		}).each(function() {
+			var p = $.proxy($.fn.ghostslider.ui.leftRightHandler, this);
+			var slider = $($(this).attr('data-slider'));
+			slider.bind('slidecomplete', p);
+			p(null, slider.ghostslider('hasLeft'), slider.ghostslider('hasRight'), null, false);
 		});
 		
 		$('.slideshow-ui.autoslide-toggle').click(function(evt) {
-			var $this = $(this);
-			var interval = $this.attr('data-sliderui-interval');
+			var widget = $(this);
+			var interval = widget.attr('data-sliderui-interval');
 			if (interval)
 				interval = parseInt(interval);
 			else
 				interval = undefined;
-			var slider = $($this.attr('data-slider'));
+			var slider = $(widget.attr('data-slider'));
 			if (slider.ghostslider('isAutosliding')) {
 				slider.ghostslider('stop');
 			} else {
 				slider.ghostslider('start', interval);
 			}
-			$this.html(slider.ghostslider('isAutosliding') ? $this.attr('data-sliderui-stopicon') : $this.attr('data-sliderui-starticon'));
+			widget.fadeOut(function() {
+				widget.html(slider.ghostslider('isAutosliding') ? widget.attr('data-sliderui-stopicon') : widget.attr('data-sliderui-starticon'));
+			}).fadeIn();
 		}).each(function() {
-			var $this = $(this);
-			var slider = $($this.attr('data-slider'));
-			$this.html(slider.ghostslider('isAutosliding') ? $this.attr('data-sliderui-stopicon') : $this.attr('data-sliderui-starticon'));
+			var widget = $(this);
+			var slider = $(widget.attr('data-slider'));
+			widget.html(slider.ghostslider('isAutosliding') ? widget.attr('data-sliderui-stopicon') : widget.attr('data-sliderui-starticon'));
 		});
 		
 		$('.slideshow-ui.slidelist').each(function() {
@@ -85,6 +116,7 @@
 				widget.children().removeClass('current');
 				cur = slides.filter(function() { return $(this).position().left == 0; }).attr('data-slider-index');
 				widget.children('[data-slide=' + cur + ']').addClass('current');
+				evt.stopPropagation();
 			})
 		});
 		

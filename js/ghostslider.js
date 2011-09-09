@@ -79,18 +79,19 @@
 			var dragEvents = 'touchstart touchend touchmove';
 			if (elem.attr('data-slider-allowmouse') == 'true')
 				dragEvents += ' mousedown mousemove mouseup';
-			elem
-				.data('slider', this)
-				.bind('touchstart touchmove mousedown mouseup', $.proxy(this, '_touchBreak'))
+			$(window)
 				.resize(function(evt) {
-					$(this).children().each(function() {
-						var i = $(this).data('slider.index');
+					elem.children().each(function() {
+						var i = $(this).data('slider.position');
 						if (i == undefined)
 							return;
 						i = Math.abs(i) > 1 ? Math.sign(i) : i;
 						$(this).css({left: i * $(this).parent().width()});
 					});
-				})
+				});
+			elem
+				.data('slider', this)
+				.bind('touchstart touchmove mousedown mouseup', $.proxy(this, '_touchBreak'))
 				.find('a').bind('touchstart touchend', $.proxy(this, '_clickHandler')).end()
 				.find('img').bind('dragstart', function() { return false; }).end()
 				.children()
@@ -145,6 +146,7 @@
 			evt = normalize(evt);
 			if ((evt.touchCount > 1) || this.slider.children(':animated').length)
 				return;
+			evt.stopPropagation();
 			return this['_' + evt.type](evt);
 		},
 

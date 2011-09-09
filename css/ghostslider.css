@@ -8,8 +8,8 @@
 
 .slideshow > * {
 	overflow: hidden;
-	height: inherit;
-	width: inherit;
+	height: 100%;
+	width: 100%;
 	position: absolute;
 	display: block;
 	margin: 0px;
