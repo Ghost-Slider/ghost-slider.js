@@ -79,16 +79,23 @@
 			var dragEvents = 'touchstart touchend touchmove';
 			if (elem.attr('data-slider-allowmouse') == 'true')
 				dragEvents += ' mousedown mousemove mouseup';
-			$(window)
-				.resize(function(evt) {
-					elem.children().each(function() {
-						var i = $(this).data('slider.position');
-						if (i == undefined)
-							return;
-						i = Math.abs(i) > 1 ? Math.sign(i) : i;
-						$(this).css({left: i * $(this).parent().width()});
-					});
+
+			var resizeHandler = function(evt) {
+				var maxSlideHeight = 0;
+				elem.children().each(function() {
+					var i = $(this).data('slider.position');
+					if (i == undefined)
+						return;
+					i = Math.abs(i) > 1 ? Math.sign(i) : i;
+					$(this).css({left: i * $(this).parent().width()});
+					if ($(this).height() > maxSlideHeight)
+						maxSlideHeight = $(this).height();
 				});
+				if (elem.ghostslider('isAdaptive'))
+					elem.height(maxSlideHeight);
+			};
+
+			$(window).resize(resizeHandler);
 			elem
 				.data('slider', this)
 				.bind('touchstart touchmove mousedown mouseup', $.proxy(this, '_touchBreak'))
@@ -103,9 +110,14 @@
 						$(this)
 							.data('slider.position', i)
 							.attr(Slider.indexAttr, n)
-							.css({left: f * $(this).parent().width()});
+
 					})
 					.bind(dragEvents, $.proxy(this, '_touchHandler'));
+
+			elem.find('img').load(function() {
+				resizeHandler();
+				resizeHandler(); 
+			});
 
 			this.start();
 
@@ -345,7 +357,7 @@
 				this.slider.children().filter(function() { return $(this).data('slider.position') == -1; })
 			);
 		},
-		
+
 		/**
 		 * Slides to the right.
 		 */
@@ -414,7 +426,7 @@
 				interval = this.slider.attr('data-slider-autoslide-interval');
 			else
 				this.slider.attr('data-slider-autoslide-interval', interval);
-			
+
 			interval = parseInt(interval);
 			if (!interval)
 				return;
@@ -437,13 +449,17 @@
 				this.timer = false;
 			}
 		},
-		
+
 		/**
 		 * Checks if the autoslider is active.
 		 * @return True if the autoslider is active, false otherwise.
 		 */
 		isAutosliding: function() {
 			return (!!this.timer);
+		},
+
+		isAdaptive: function() {
+			return this.slider.attr('data-slider-adaptive') == 'true';
 		}
 	};
 
