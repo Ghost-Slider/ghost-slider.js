@@ -88,6 +88,8 @@
 						return;
 					i = Math.abs(i) > 1 ? Math.sign(i) : i;
 					$(this).css({left: i * $(this).parent().width()});
+					if (elem.ghostslider('isAdaptive'))
+						$(this).css('height', 'auto');
 					if ($(this).height() > maxSlideHeight)
 						maxSlideHeight = $(this).height();
 				});
