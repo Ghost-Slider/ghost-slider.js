@@ -96,14 +96,40 @@
 				if (elem.ghostslider('isAdaptive'))
 					elem.height(maxSlideHeight);
 			};
+			
+			resizeHandler.kickoff = function(evt) {
+				resizeHandler(evt);
+				resizeHandler(evt);
+			};
 
 			$(window).resize(resizeHandler);
 			elem
+				.css({
+					position: 'relative',
+					overflow: 'hidden',
+					margin: 0,
+					padding: 0
+				})
 				.data('slider', this)
 				.bind('touchstart touchmove mousedown mouseup', $.proxy(this, '_touchBreak'))
 				.find('a').bind('touchstart touchend', $.proxy(this, '_clickHandler')).end()
 				.find('img').bind('dragstart', function() { return false; }).end()
 				.children()
+					.css({
+						overflow: 'hidden',
+						height: '100%',
+						width: '100%',
+						position: 'absolute',
+						display: 'block',
+						margin: 0,
+						padding: 0,
+						'user-select': 'none',
+						'-webkit-user-select': 'none',
+						'-moz-user-select': 'none',
+						'-webkit-user-drag': 'none',
+						'-o-user-select': 'none',
+						'-khtml-user-select': 'none'
+					})
 					.each(function(n) {
 						var i = n;
 						if (!bounce && (i > max))
@@ -116,10 +142,8 @@
 					})
 					.bind(dragEvents, $.proxy(this, '_touchHandler'));
 
-			elem.find('img').load(function() {
-				resizeHandler();
-				resizeHandler(); 
-			});
+			if (!elem.find('img').load(resizeHandler.kickoff).length)
+				resizeHandler.kickoff();
 
 			this.start();
 
@@ -423,7 +447,6 @@
 		 * @param interval A new interval for the autoslider timer (optional).
 		 */
 		start: function(interval) {
-			console.log('start ' + interval);
 			if (!interval)
 				interval = this.slider.attr('data-slider-autoslide-interval');
 			else
