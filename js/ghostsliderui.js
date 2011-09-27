@@ -25,7 +25,6 @@
  		var widget = $(this);
  		if (animate === undefined)
 	 		var animate = widget.attr('data-ui-animate');
- 		console.log(animate);
 		var hlr = widget.hasClass('slide-left') ? hasLeft : hasRight;
 		if (!hlr) {
 			if (animate && widget.css('opacity') > 0)
